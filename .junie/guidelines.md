@@ -17,3 +17,6 @@ L'application est divisée en deux parties distinctes :
 Les détails des fonctionnalités se trouvent dans le dossier `features/` :
 *   `features.md` : Description globale.
 *   Fichiers individuels : Explications détaillées et état d'avancement.
+
+Le site sera développé selon une méthodologie "monolithique", cad le fait d'utiliser le moins de dépendances possiblee et le moins de javascript possible.
+Pour ce faire on travaillera avec les LiveComponent de Symfony, et avec des "rechargements de page" à l'ancienne (je clique = je passe par une route qui charge une page). 

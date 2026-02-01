@@ -14,13 +14,14 @@ Chaque joueur dispose de 1 ou plusieurs personnages, mais un seul personnage est
     *   Répartition en 5 paliers : Indemne, Égratigné, Blessure légère, Blessure grave, Blessure critique.
     *   Chaque palier compte X carrés (X = valeur de PV du personnage).
 * Toujours à gauche : le niveau de stress du personnage (quantité de stress actuelle)
-*   **Centre** : Avatar du personnage.
+*   **Centre** : Avatar du personnage. En-dessous, nombre de points d'expérience "XP" et de réputation "REP".
 *   **Droite** : Caractéristiques principales (Force, Adresse, Intelligence).
 
 ### Zone centrale (sous le bandeau)
 Affichage des compétences du personnage classées en 3 catégories (Force, Adresse, Intelligence).
 *   Une ligne par compétence.
 *   Indicateur de niveau : 10 carrés au total, X carrés jaunes (X = niveau du personnage) et le reste en gris.
+* Un bouton "level up" qui permet d'ouvrir l'interface de level up
 
 ### Navigation
 Boutons permettant de switcher vers :
@@ -49,3 +50,7 @@ L'interface téléphonne contient une liste de contact. Un contact est une div c
 #### "LIFE"
 Cette interface contient un deck de cartes. Elle permet de piocher des cartes, d'afficher les cartes du deck, d'afficher la défausse. Le joueur peut piocher des cartes jusqu'à un maximum de X (à configurer) + les éventuelles cartes piochables grâce à un effet d'une autre carte piochée.
 Les cartes seront créées à partir d'une interface MJ et assignées au deck du joueur par le MJ
+
+#### Level up
+Cette interface affiche toutes les compétences existantes et permet d'en créer de nouvelles (spécifiquement pour ce personnage) puis de cliquer sur un bouton "+" en regard de chaque compétence pour y ajouter un niveau. 
+En dessous des compétences seront listés les différents dons, skills, talents etc. qu'on peut acheter avec de l'xp. Ces achats viendront ajouter un nouvel élément sur les capacités du personnage. 
