@@ -19,4 +19,4 @@ Les détails des fonctionnalités se trouvent dans le dossier `features/` :
 *   Fichiers individuels : Explications détaillées et état d'avancement.
 
 Le site sera développé selon une méthodologie "monolithique", cad le fait d'utiliser le moins de dépendances possiblee et le moins de javascript possible.
-Pour ce faire on travaillera avec les LiveComponent de Symfony, et avec des "rechargements de page" à l'ancienne (je clique = je passe par une route qui charge une page). 
+Pour ce faire on travaillera avec des "rechargements de page" à l'ancienne (je clique = je passe par une route qui charge une page). on utilisera la propriété CSS "view transition{ navigation : auto} pour donner un rendu SPA sans JavaScript
