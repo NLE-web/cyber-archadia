@@ -1,6 +1,6 @@
 body {
     background-color: skyblue;
 }
-window {
-    transition: all;
+@view-transition {
+    navigation: auto;
 }
