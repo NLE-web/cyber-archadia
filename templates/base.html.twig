@@ -1,17 +1,75 @@
 <!DOCTYPE html>
 <html data-theme="yellow">
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>{% block title %}Archadia{% endblock %}</title>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    {% block stylesheets %}{% endblock %}
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+</head>
+
+<body class="bg-app text-app">
+{% block layout %}
+
+    {# ===== "device frame" pour desktop + centrer l’UI ===== #}
+    <div class="min-h-dvh w-full flex justify-center px-3 py-3">
+        <div class="w-full max-w-md">
+            {# ✅ frame = hauteur écran + layout en colonne #}
+            <div class="relative min-h-dvh rounded-[28px] border border-app shadow-neon overflow-hidden">
+                <div class="app-shell !px-4 !py-4 flex min-h-dvh flex-col">
+
+                    {# ===== HEADER (ne scroll pas) ===== #}
+                    <header class="app-header shrink-0 flex items-center justify-center">
+                        <h1 class="text-lg font-semibold tracking-[0.35em] text-accent text-neon">
+                            ARCHADIA.NET
+                        </h1>
+                    </header>
+
+                    {# ===== MAIN (✅ seule zone scrollable) ===== #}
+                    <main class="flex-1 overflow-y-auto pt-4 pb-6">
+                        {% block body %}
+                            <section class="card card--neon scanlines h-full flex items-center justify-center">
+                                <h1 class="text-2xl font-semibold tracking-[0.25em] text-neon text-accent">
+                                    ARCHADIA.NET
+                                </h1>
+                            </section>
+                        {% endblock %}
+                    </main>
+
+                    {# ===== BOTTOM NAV (✅ toujours en bas) ===== #}
+                    <nav class="shrink-0 sticky bottom-0 left-0 right-0 pb-[env(safe-area-inset-bottom)] z-30">
+                        <div class="glass rounded-2xl border border-app shadow-neon scanlines">
+                            <div class="grid grid-cols-4">
+                                {% block bottom_nav %}
+                                    <a href="#" class="py-3 text-center">
+                                        <div class="text-accent text-neon text-sm">⌂</div>
+                                        <div class="text-[11px] text-muted mt-1">Accueil</div>
+                                    </a>
+                                    <a href="#" class="py-3 text-center">
+                                        <div class="text-accent text-neon text-sm">⛯</div>
+                                        <div class="text-[11px] text-muted mt-1">Fiche</div>
+                                    </a>
+                                    <a href="#" class="py-3 text-center">
+                                        <div class="text-accent text-neon text-sm">⟡</div>
+                                        <div class="text-[11px] text-muted mt-1">Logs</div>
+                                    </a>
+                                    <a href="#" class="py-3 text-center">
+                                        <div class="text-accent text-neon text-sm">⚙</div>
+                                        <div class="text-[11px] text-muted mt-1">Réglages</div>
+                                    </a>
+                                {% endblock %}
+                            </div>
+                        </div>
+                    </nav>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+</body>
 </html>

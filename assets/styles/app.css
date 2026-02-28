@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@reference "tailwindcss";
+@import "tailwindcss";
 
 @view-transition {
     navigation: auto;
@@ -15,16 +14,16 @@
 @layer base {
     :root {
         /* Surfaces */
-        --bg: 10 10 14;          /* fond principal */
-        --panel: 16 16 24;       /* cartes/panels */
-        --panel-2: 20 20 32;     /* variante */
-        --text: 236 236 245;     /* texte */
-        --muted: 155 155 175;    /* texte secondaire */
-        --border: 70 70 95;      /* bordures */
+        --bg: 10 10 14; /* fond principal */
+        --panel: 16 16 24; /* cartes/panels */
+        --panel-2: 20 20 32; /* variante */
+        --text: 236 236 245; /* texte */
+        --muted: 155 155 175; /* texte secondaire */
+        --border: 70 70 95; /* bordures */
 
         /* Accent (par défaut = red) */
-        --accent: 255 0 80;      /* rouge fluo */
-        --accent-2: 255 64 140;  /* rouge fluo (variant) */
+        --accent: 255 0 80; /* rouge fluo */
+        --accent-2: 255 64 140; /* rouge fluo (variant) */
 
         /* Feedback */
         --ok: 0 255 170;
@@ -49,7 +48,8 @@
         --accent-2: 255 180 0;
     }
 
-    html, body {
+    html,
+    body {
         height: 100%;
     }
 
@@ -60,7 +60,8 @@
             radial-gradient(900px 700px at 80% 20%, rgb(var(--accent) / 0.06), transparent 50%),
             linear-gradient(180deg, rgb(var(--bg)) 0%, rgb(var(--bg)) 100%);
         color: rgb(var(--text));
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial,
+        "Apple Color Emoji", "Segoe UI Emoji";
     }
 
     /* Scrollbars (webview/mobile friendly) */
@@ -68,7 +69,10 @@
         scrollbar-width: thin;
         scrollbar-color: rgb(var(--accent) / 0.6) rgb(var(--bg));
     }
-    *::-webkit-scrollbar { width: 10px; height: 10px; }
+    *::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
     *::-webkit-scrollbar-thumb {
         background: rgb(var(--accent) / 0.45);
         border-radius: 999px;
@@ -89,53 +93,71 @@
     }
 }
 
-@layer utilities {
-    /* Couleurs basées sur variables */
-    .bg-app { background-color: rgb(var(--bg)); }
-    .bg-panel { background-color: rgb(var(--panel)); }
-    .bg-panel-2 { background-color: rgb(var(--panel-2)); }
+/* =========================================================
+   Utilities v4 (@utility) — utilisables via @apply
+   ========================================================= */
 
-    .text-app { color: rgb(var(--text)); }
-    .text-muted { color: rgb(var(--muted)); }
+@utility bg-app {
+    background-color: rgb(var(--bg));
+}
+@utility bg-panel {
+    background-color: rgb(var(--panel));
+}
+@utility bg-panel-2 {
+    background-color: rgb(var(--panel-2));
+}
 
-    .border-app { border-color: rgb(var(--border) / 0.7); }
+@utility text-app {
+    color: rgb(var(--text));
+}
+@utility text-muted {
+    color: rgb(var(--muted));
+}
 
-    .text-accent { color: rgb(var(--accent)); }
-    .bg-accent { background-color: rgb(var(--accent)); }
-    .border-accent { border-color: rgb(var(--accent)); }
+@utility border-app {
+    border-color: rgb(var(--border) / 0.7);
+}
 
-    /* Glows / néon */
-    .shadow-neon {
-        box-shadow:
-            0 0 0 1px rgb(var(--accent) / 0.35),
-            0 0 18px rgb(var(--accent) / calc(var(--glow) * 0.55)),
-            0 0 42px rgb(var(--accent) / calc(var(--glow) * 0.25));
-    }
-    .text-neon {
-        text-shadow:
-            0 0 8px rgb(var(--accent) / 0.60),
-            0 0 24px rgb(var(--accent) / 0.22);
-    }
+@utility text-accent {
+    color: rgb(var(--accent));
+}
+@utility bg-accent {
+    background-color: rgb(var(--accent));
+}
+@utility border-accent {
+    border-color: rgb(var(--accent));
+}
 
-    /* Micro texture "scanlines" (optionnelle sur panels) */
-    .scanlines {
-        background-image:
-            linear-gradient(to bottom, rgb(255 255 255 / 0.03) 1px, transparent 1px);
-        background-size: 100% 6px;
-    }
+/* Glows / néon */
+@utility shadow-neon {
+    box-shadow:
+        0 0 0 1px rgb(var(--accent) / 0.35),
+        0 0 18px rgb(var(--accent) / calc(var(--glow) * 0.55)),
+        0 0 42px rgb(var(--accent) / calc(var(--glow) * 0.25));
+}
+@utility text-neon {
+    text-shadow:
+        0 0 8px rgb(var(--accent) / 0.60),
+        0 0 24px rgb(var(--accent) / 0.22);
+}
 
-    /* Effet "glass" cyber */
-    .glass {
-        background: linear-gradient(180deg, rgb(var(--panel) / 0.72), rgb(var(--panel-2) / 0.55));
-        backdrop-filter: blur(10px);
-        border: 1px solid rgb(var(--border) / 0.55);
-    }
+/* Micro texture "scanlines" (optionnelle sur panels) */
+@utility scanlines {
+    background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.03) 1px, transparent 1px);
+    background-size: 100% 6px;
+}
 
-    /* Ligne de séparation stylée */
-    .hr-neon {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgb(var(--accent) / 0.75), transparent);
-    }
+/* Effet "glass" cyber */
+@utility glass {
+    background: linear-gradient(180deg, rgb(var(--panel) / 0.72), rgb(var(--panel-2) / 0.55));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgb(var(--border) / 0.55);
+}
+
+/* Ligne de séparation stylée */
+@utility hr-neon {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(var(--accent) / 0.75), transparent);
 }
 
 @layer components {
@@ -155,9 +177,11 @@
         @apply rounded-2xl p-4 border border-app;
         background: linear-gradient(180deg, rgb(var(--panel) / 0.95), rgb(var(--panel-2) / 0.85));
     }
+    /* ✅ v4-safe: pas de @apply card */
     .card--neon {
-        @apply card shadow-neon;
+        @apply shadow-neon;
     }
+
     .card-title {
         @apply text-lg font-semibold tracking-wide;
     }
@@ -171,18 +195,21 @@
         @apply border border-app;
         background: linear-gradient(180deg, rgb(var(--panel)), rgb(var(--panel-2)));
     }
-    .btn:active { transform: translateY(1px); }
+    .btn:active {
+        transform: translateY(1px);
+    }
 
+    /* ✅ v4-safe: pas de @apply btn */
     .btn-primary {
-        @apply btn border-accent;
+        @apply border-accent;
         background: linear-gradient(180deg, rgb(var(--accent) / 0.95), rgb(var(--accent-2) / 0.85));
         color: rgb(var(--bg));
         box-shadow:
             0 0 0 1px rgb(var(--accent) / 0.55),
             0 0 18px rgb(var(--accent) / 0.35);
     }
+    /* ✅ v4-safe: pas de @apply btn */
     .btn-ghost {
-        @apply btn;
         background: transparent;
     }
 
@@ -191,7 +218,9 @@
         @apply w-full rounded-xl px-4 py-3 text-sm border border-app;
         background: rgb(var(--panel) / 0.75);
     }
-    .input::placeholder { color: rgb(var(--muted) / 0.8); }
+    .input::placeholder {
+        color: rgb(var(--muted) / 0.8);
+    }
     .input:focus {
         border-color: rgb(var(--accent) / 0.75);
         box-shadow: var(--ring);
@@ -203,8 +232,8 @@
         border: 1px solid rgb(var(--border) / 0.6);
         background: rgb(var(--panel) / 0.65);
     }
+    /* ✅ v4-safe: pas de @apply badge */
     .badge-accent {
-        @apply badge;
         border-color: rgb(var(--accent) / 0.75);
         color: rgb(var(--accent));
     }
@@ -214,8 +243,12 @@
         @apply flex items-center justify-between rounded-xl px-4 py-3 border border-app;
         background: rgb(var(--panel) / 0.55);
     }
-    .stat-label { @apply text-sm text-muted; }
-    .stat-value { @apply text-base font-semibold text-app; }
+    .stat-label {
+        @apply text-sm text-muted;
+    }
+    .stat-value {
+        @apply text-base font-semibold text-app;
+    }
 
     /* Barres (HP, énergie, etc.) */
     .bar {
