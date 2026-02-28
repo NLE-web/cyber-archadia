@@ -6,14 +6,7 @@ Statut : <span style="color:red">Pas implémenté</span>
 Chaque joueur dispose de 1 ou plusieurs personnages, mais un seul personnage est actif. Si un joueur n'a pas de personnage actif, il est invité à créé un personnage et c'est la seule interaction possible avec l'application. Si il a un personnage actif, il est redirigé automatiquement sur la fiche du personnage.
 
 ### Bandeau horizontal supérieur
-*   **Gauche** : Points de vie sous forme de petits carrés.
-    *   Gris clair : Armure
-    *   Vert : Biologique
-    *   Rouge : Bio perdu
-    *   Mauve : Armure perdue
-    *   Répartition en 5 paliers : Indemne, Égratigné, Blessure légère, Blessure grave, Blessure critique.
-    *   Chaque palier compte X carrés (X = valeur de PV du personnage).
-* Toujours à gauche : le niveau de stress du personnage (quantité de stress actuelle)
+*   **Gauche** : deux barres, une barre de points de vie et une barre de stress. la barre de points de vie est verte et contient des segments gris acier qui représente des points de résistance cybernétique. Un message de statut rouge s'affiche à droite quand le personnage descend en dessous de certains seuils (blessé, critique, etc). la deuxième barre est la barre de stress qui pars de 0 et se remplit au fur et à mesure
 *   **Centre** : Avatar du personnage. En-dessous, nombre de points d'expérience "XP" et de réputation "REP".
 *   **Droite** : Caractéristiques principales (Force, Adresse, Intelligence).
 
