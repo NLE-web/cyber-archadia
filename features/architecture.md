@@ -70,3 +70,43 @@ Pour les interactions critiques (ex: le MJ inflige des dégâts à un personnage
 - Un message est dispatché via Messenger.
 - Un événement est envoyé au client (via Mercure/Turbo).
 - La fiche se met à jour dynamiquement.
+
+
+visuellement
+
+
+┌──────────────────────────────────┐
+│ HEADER APP                       │
+│ Nom du personnage + statut       │
+└──────────────────────────────────┘
+
+┌──────────────────────────────────┐
+│ SECTION 1 — IDENTITÉ             │
+│                                  │
+│  [ IMAGE PERSONNAGE ]            │
+│                                  │
+│  ┌───────┬───────┬───────┐       │
+│  │ PUI   │ DEX   │ INT   │       │
+│  │  3    │  4    │  2    │       │
+│  └───────┴───────┴───────┘       │
+│                                  │
+│  PV ███████░░░  18 / 24          │
+│                                  │
+└──────────────────────────────────┘
+
+┌──────────────────────────────────┐
+│ SECTION 2 — MODULES              │
+│                                  │
+│ [Inventaire][Compétences][Cyber] │  ← Tabs
+│                                  │
+│ ──────────────────────────────── │
+│                                  │
+│         CONTENU TAB              │
+│                                  │
+│  (scroll interne)                │
+│                                  │
+└──────────────────────────────────┘
+
+┌──────────────────────────────────┐
+│ NAVIGATION / ACTION RAPIDE       │
+└──────────────────────────────────┘
