@@ -31,7 +31,7 @@ Voici la configuration recommandée à insérer dans le `head` (via Twig) :
       "score": 0.5
     },
     {
-      "where": {
+      "where":y {
         "and": [
           { "href_matches": "/*" },
           { "not": { "href_matches": ["/logout", "/admin/*"] } }
