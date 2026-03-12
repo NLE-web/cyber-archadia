@@ -34,6 +34,15 @@ class Edgerunner
     #[ORM\Column]
     private ?int $stresspoints = null;
 
+    #[ORM\ManyToOne(inversedBy: 'edgerunners')]
+    private ?User $player = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $isActive = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?ImageFile $avatar = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +128,42 @@ class Edgerunner
     public function setStresspoints(int $stresspoints): static
     {
         $this->stresspoints = $stresspoints;
+
+        return $this;
+    }
+
+    public function getPlayer(): ?User
+    {
+        return $this->player;
+    }
+
+    public function setPlayer(?User $player): static
+    {
+        $this->player = $player;
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(?bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getAvatar(): ?ImageFile
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?ImageFile $avatar): static
+    {
+        $this->avatar = $avatar;
 
         return $this;
     }
