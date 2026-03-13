@@ -37,6 +37,8 @@ class AppFixtures extends Fixture
         $edgerunner->setLifepoints(20);
         $edgerunner->setCyberpoints(5);
         $edgerunner->setStresspoints(0);
+        $edgerunner->setLostlife(4);
+        $edgerunner->setLostcyber(1);
         $edgerunner->setIsActive(true);
         $edgerunner->setPlayer($user);
         $edgerunner->setAvatar($avatar);

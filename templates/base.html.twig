@@ -1,5 +1,13 @@
 <!DOCTYPE html>
-<html data-theme="red">
+{% if is_granted("ROLE_USER") %}
+    {% if app.user.themeColor %}
+        <html data-theme="{{ app.user.themeColor }}">
+    {% else %}
+        <html data-theme="red">
+    {% endif %}
+    {% else %}
+        <html data-theme="red">
+{% endif %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -12,64 +20,23 @@
 </head>
 
 <body class="bg-app text-app">
-{% block layout %}
+<div class="min-h-dvh flex justify-center">
+    <div class="w-full max-w-md">
+        <div class="relative min-h-dvh overflow-hidden rounded-[28px] border border-app shadow-neon">
+            <div class="flex min-h-dvh flex-col px-4 py-4">
 
-    {# ===== "device frame" pour desktop + centrer l’UI ===== #}
-    <div class="min-h-dvh w-full flex justify-center px-3 py-3">
-        <div class="w-full max-w-md">
-            {# ✅ frame = hauteur écran + layout en colonne #}
-            <div class="relative min-h-dvh rounded-[28px] border border-app shadow-neon overflow-hidden">
-                <div class="app-shell !px-4 !py-4 flex min-h-dvh flex-col">
+                <header class="sticky top-0 z-20 flex items-center justify-center border-b border-app bg-app/80 px-4 py-3 backdrop-blur">
+                    <h1 class="text-lg font-semibold tracking-[0.35em] text-accent text-neon">
+                        ARCHADIA.NET
+                    </h1>
+                </header>
 
-                    {# ===== HEADER (ne scroll pas) ===== #}
-                    <header class="app-header shrink-0 flex items-center justify-center">
-                        <h1 class="text-lg font-semibold tracking-[0.35em] text-accent text-neon">
-                            ARCHADIA.NET
-                        </h1>
-                    </header>
-
-                    {# ===== MAIN (✅ seule zone scrollable) ===== #}
-                    <main class="flex-1 overflow-y-auto pt-4 pb-6">
-                        {% block body %}
-                            <section class="card card--neon scanlines h-full flex items-center justify-center">
-                                <h1 class="text-2xl font-semibold tracking-[0.25em] text-neon text-accent">
-                                    ARCHADIA.NET
-                                </h1>
-                            </section>
-                        {% endblock %}
-                    </main>
-
-                    {# ===== BOTTOM NAV (✅ toujours en bas) ===== #}
-                    <nav class="shrink-0 sticky bottom-0 left-0 right-0 pb-[env(safe-area-inset-bottom)] z-30">
-                        <div class="glass rounded-2xl border border-app shadow-neon scanlines">
-                            <div class="grid grid-cols-4">
-                                {% block bottom_nav %}
-                                    <a href="#" class="py-3 text-center">
-                                        <div class="text-accent text-neon text-sm">⌂</div>
-                                        <div class="text-[11px] text-muted mt-1">Accueil</div>
-                                    </a>
-                                    <a href="#" class="py-3 text-center">
-                                        <div class="text-accent text-neon text-sm">⛯</div>
-                                        <div class="text-[11px] text-muted mt-1">Fiche</div>
-                                    </a>
-                                    <a href="#" class="py-3 text-center">
-                                        <div class="text-accent text-neon text-sm">⟡</div>
-                                        <div class="text-[11px] text-muted mt-1">Logs</div>
-                                    </a>
-                                    <a href="#" class="py-3 text-center">
-                                        <div class="text-accent text-neon text-sm">⚙</div>
-                                        <div class="text-[11px] text-muted mt-1">Réglages</div>
-                                    </a>
-                                {% endblock %}
-                            </div>
-                        </div>
-                    </nav>
-
-                </div>
+                <main class="flex-1 overflow-y-auto">
+                    {% block body %}{% endblock %}
+                </main>
             </div>
         </div>
     </div>
-
-{% endblock %}
+</div>
 </body>
 </html>

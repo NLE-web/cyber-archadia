@@ -43,6 +43,11 @@ class Edgerunner
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?ImageFile $avatar = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $lostlife = null;
+
+    #[ORM\Column]
+    private ?int $lostcyber = null;
     public function getId(): ?int
     {
         return $this->id;
@@ -164,6 +169,30 @@ class Edgerunner
     public function setAvatar(?ImageFile $avatar): static
     {
         $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getLostlife(): ?int
+    {
+        return $this->lostlife;
+    }
+
+    public function setLostlife(?int $lostlife): static
+    {
+        $this->lostlife = $lostlife;
+
+        return $this;
+    }
+
+    public function getLostcyber(): ?int
+    {
+        return $this->lostcyber;
+    }
+
+    public function setLostcyber(int $lostcyber): static
+    {
+        $this->lostcyber = $lostcyber;
 
         return $this;
     }

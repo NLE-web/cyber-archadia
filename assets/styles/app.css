@@ -1,4 +1,3 @@
-@reference "tailwindcss";
 @import "tailwindcss";
 
 @view-transition {
@@ -6,38 +5,54 @@
 }
 
 /* =========================================================
-   CYBERPUNK MOBILE-FIRST BASE (Tailwind)
-   - Thèmes via data-theme="red" | "yellow"
-   - Variables CSS utilisées dans des utilities Tailwind custom
+   THEME TOKENS ONLY
+   - Gère uniquement les couleurs et effets colorimétriques
+   - Aucun layout
+   - Aucun composant
+   - Aucun spacing / sizing / width / positioning
    ========================================================= */
 
 @layer base {
     :root {
-        /* Surfaces */
-        --bg: 10 10 14; /* fond principal */
-        --panel: 16 16 24; /* cartes/panels */
-        --panel-2: 20 20 32; /* variante */
-        --text: 236 236 245; /* texte */
-        --muted: 155 155 175; /* texte secondaire */
-        --border: 70 70 95; /* bordures */
 
-        /* Accent (par défaut = red) */
-        --accent: 255 0 80; /* rouge fluo */
-        --accent-2: 255 64 140; /* rouge fluo (variant) */
+        /* barres de ressources */
+        --bar-life: rgb(var(--accent));
+        --bar-life-glow: rgb(var(--accent) / 0.7);
+
+        --bar-cyber: #7f8fa6;
+        --bar-cyber-glow: rgba(150,180,200,0.6);
+
+        --bar-stress: rgb(var(--accent-2));
+    }
+    :root {
+        /* Surfaces */
+        --bg: 10 10 14;
+        --panel: 16 16 24;
+        --panel-2: 20 20 32;
+
+        /* Texte */
+        --text: 236 236 245;
+        --muted: 155 155 175;
+
+        /* Bordures */
+        --border: 70 70 95;
+
+        /* Accent par défaut */
+        --accent: 255 0 80;
+        --accent-2: 255 64 140;
 
         /* Feedback */
         --ok: 0 255 170;
         --warn: 255 210 70;
         --danger: 255 70 70;
 
-        /* Glow / FX */
+        /* FX */
         --glow: 0.65;
         --ring: 0 0 0 3px rgb(var(--accent) / 0.25);
 
         color-scheme: dark;
     }
 
-    /* Theme switch: <html data-theme="red"> / "yellow" */
     html[data-theme="red"] {
         --accent: 255 0 80;
         --accent-2: 255 64 140;
@@ -48,61 +63,63 @@
         --accent-2: 255 180 0;
     }
 
-    html,
-    body {
-        height: 100%;
+    html[data-theme="teal"] {
+        --accent: 0 255 200;
+        --accent-2: 0 190 255;
+    }
+
+    html[data-theme="orange"] {
+        --accent: 255 120 0;
+        --accent-2: 255 180 0;
+    }
+
+    html[data-theme="purple"] {
+        --accent: 180 70 255;
+        --accent-2: 255 70 220;
+    }
+
+    html[data-theme="blue"] {
+        --accent: 0 170 255;
+        --accent-2: 80 120 255;
+    }
+
+    html[data-theme="green"] {
+        --accent: 80 255 120;
+        --accent-2: 0 220 140;
     }
 
     body {
-        @apply antialiased;
         background:
             radial-gradient(1200px 800px at 20% 10%, rgb(var(--accent) / 0.10), transparent 55%),
             radial-gradient(900px 700px at 80% 20%, rgb(var(--accent) / 0.06), transparent 50%),
             linear-gradient(180deg, rgb(var(--bg)) 0%, rgb(var(--bg)) 100%);
         color: rgb(var(--text));
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial,
-        "Apple Color Emoji", "Segoe UI Emoji";
     }
 
-    /* Scrollbars (webview/mobile friendly) */
-    * {
-        scrollbar-width: thin;
-        scrollbar-color: rgb(var(--accent) / 0.6) rgb(var(--bg));
-    }
-    *::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
-    }
-    *::-webkit-scrollbar-thumb {
-        background: rgb(var(--accent) / 0.45);
-        border-radius: 999px;
-        border: 2px solid rgb(var(--bg));
-    }
-
-    /* Sélections */
     ::selection {
         background: rgb(var(--accent) / 0.35);
         color: rgb(var(--text));
     }
 
-    /* Focus visible cohérent */
     :focus-visible {
-        outline: none;
-        box-shadow: var(--ring);
-        border-radius: 10px;
+        outline-color: rgb(var(--accent) / 0.75);
     }
 }
 
 /* =========================================================
-   Utilities v4 (@utility) — utilisables via @apply
+   COLOR UTILITIES ONLY
+   - Utilitaires réutilisables dans les templates
+   - Aucun impact sur layout/sizing
    ========================================================= */
 
 @utility bg-app {
     background-color: rgb(var(--bg));
 }
+
 @utility bg-panel {
     background-color: rgb(var(--panel));
 }
+
 @utility bg-panel-2 {
     background-color: rgb(var(--panel-2));
 }
@@ -110,159 +127,128 @@
 @utility text-app {
     color: rgb(var(--text));
 }
+
 @utility text-muted {
     color: rgb(var(--muted));
+}
+
+@utility text-accent {
+    color: rgb(var(--accent));
+}
+
+@utility text-accent-2 {
+    color: rgb(var(--accent-2));
 }
 
 @utility border-app {
     border-color: rgb(var(--border) / 0.7);
 }
 
-@utility text-accent {
-    color: rgb(var(--accent));
-}
-@utility bg-accent {
-    background-color: rgb(var(--accent));
-}
 @utility border-accent {
     border-color: rgb(var(--accent));
 }
 
-/* Glows / néon */
-@utility shadow-neon {
-    box-shadow:
-        0 0 0 1px rgb(var(--accent) / 0.35),
-        0 0 18px rgb(var(--accent) / calc(var(--glow) * 0.55)),
-        0 0 42px rgb(var(--accent) / calc(var(--glow) * 0.25));
+@utility border-accent-soft {
+    border-color: rgb(var(--accent) / 0.35);
 }
+
+@utility bg-accent {
+    background-color: rgb(var(--accent));
+}
+
+@utility bg-accent-2 {
+    background-color: rgb(var(--accent-2));
+}
+
+@utility bg-accent-soft {
+    background-color: rgb(var(--accent) / 0.12);
+}
+
+@utility bg-panel-soft {
+    background-color: rgb(var(--panel) / 0.72);
+}
+
+@utility bg-panel-2-soft {
+    background-color: rgb(var(--panel-2) / 0.72);
+}
+
+@utility ring-accent-soft {
+    --tw-ring-color: rgb(var(--accent) / 0.25);
+}
+
+@utility text-ok {
+    color: rgb(var(--ok));
+}
+
+@utility text-warn {
+    color: rgb(var(--warn));
+}
+
+@utility text-danger {
+    color: rgb(var(--danger));
+}
+
+@utility bg-ok-soft {
+    background-color: rgb(var(--ok) / 0.12);
+}
+
+@utility bg-warn-soft {
+    background-color: rgb(var(--warn) / 0.12);
+}
+
+@utility bg-danger-soft {
+    background-color: rgb(var(--danger) / 0.12);
+}
+
+@utility border-ok {
+    border-color: rgb(var(--ok) / 0.45);
+}
+
+@utility border-warn {
+    border-color: rgb(var(--warn) / 0.45);
+}
+
+@utility border-danger {
+    border-color: rgb(var(--danger) / 0.45);
+}
+
+/* =========================================================
+   OPTIONAL VISUAL FX
+   - Seulement des effets visuels liés à la couleur
+   ========================================================= */
+
 @utility text-neon {
     text-shadow:
         0 0 8px rgb(var(--accent) / 0.60),
         0 0 24px rgb(var(--accent) / 0.22);
 }
 
-/* Micro texture "scanlines" (optionnelle sur panels) */
+@utility shadow-neon {
+    box-shadow:
+        0 0 0 1px rgb(var(--accent) / 0.35),
+        0 0 18px rgb(var(--accent) / calc(var(--glow) * 0.55)),
+        0 0 42px rgb(var(--accent) / calc(var(--glow) * 0.25));
+}
+
+@utility shadow-neon-soft {
+    box-shadow:
+        0 0 0 1px rgb(var(--accent) / 0.20),
+        0 0 12px rgb(var(--accent) / 0.18);
+}
+
+@utility bg-gradient-panel {
+    background: linear-gradient(180deg, rgb(var(--panel) / 0.95), rgb(var(--panel-2) / 0.85));
+}
+
+@utility bg-gradient-accent {
+    background: linear-gradient(180deg, rgb(var(--accent) / 0.95), rgb(var(--accent-2) / 0.85));
+}
+
+@utility hr-neon {
+    background: linear-gradient(90deg, transparent, rgb(var(--accent) / 0.75), transparent);
+}
+
 @utility scanlines {
     background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.03) 1px, transparent 1px);
     background-size: 100% 6px;
 }
-
-/* Effet "glass" cyber */
-@utility glass {
-    background: linear-gradient(180deg, rgb(var(--panel) / 0.72), rgb(var(--panel-2) / 0.55));
-    backdrop-filter: blur(10px);
-    border: 1px solid rgb(var(--border) / 0.55);
-}
-
-/* Ligne de séparation stylée */
-@utility hr-neon {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgb(var(--accent) / 0.75), transparent);
-}
-
-@layer components {
-    /* Layout mobile-first */
-    .app-shell {
-        @apply min-h-dvh px-4 py-4;
-    }
-    .app-header {
-        @apply sticky top-0 z-20 -mx-4 px-4 py-3;
-        background: linear-gradient(180deg, rgb(var(--bg) / 0.92), rgb(var(--bg) / 0.65));
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid rgb(var(--border) / 0.35);
-    }
-
-    /* Cards / modules */
-    .card {
-        @apply rounded-2xl p-4 border border-app;
-        background: linear-gradient(180deg, rgb(var(--panel) / 0.95), rgb(var(--panel-2) / 0.85));
-    }
-    /* ✅ v4-safe: pas de @apply card */
-    .card--neon {
-        @apply shadow-neon;
-    }
-
-    .card-title {
-        @apply text-lg font-semibold tracking-wide;
-    }
-    .card-subtitle {
-        @apply text-sm text-muted;
-    }
-
-    /* Boutons */
-    .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold;
-        @apply border border-app;
-        background: linear-gradient(180deg, rgb(var(--panel)), rgb(var(--panel-2)));
-    }
-    .btn:active {
-        transform: translateY(1px);
-    }
-
-    /* ✅ v4-safe: pas de @apply btn */
-    .btn-primary {
-        @apply border-accent;
-        background: linear-gradient(180deg, rgb(var(--accent) / 0.95), rgb(var(--accent-2) / 0.85));
-        color: rgb(var(--bg));
-        box-shadow:
-            0 0 0 1px rgb(var(--accent) / 0.55),
-            0 0 18px rgb(var(--accent) / 0.35);
-    }
-    /* ✅ v4-safe: pas de @apply btn */
-    .btn-ghost {
-        background: transparent;
-    }
-
-    /* Inputs */
-    .input {
-        @apply w-full rounded-xl px-4 py-3 text-sm border border-app;
-        background: rgb(var(--panel) / 0.75);
-    }
-    .input::placeholder {
-        color: rgb(var(--muted) / 0.8);
-    }
-    .input:focus {
-        border-color: rgb(var(--accent) / 0.75);
-        box-shadow: var(--ring);
-    }
-
-    /* Badges */
-    .badge {
-        @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
-        border: 1px solid rgb(var(--border) / 0.6);
-        background: rgb(var(--panel) / 0.65);
-    }
-    /* ✅ v4-safe: pas de @apply badge */
-    .badge-accent {
-        border-color: rgb(var(--accent) / 0.75);
-        color: rgb(var(--accent));
-    }
-
-    /* Stats (fiche perso) */
-    .stat-row {
-        @apply flex items-center justify-between rounded-xl px-4 py-3 border border-app;
-        background: rgb(var(--panel) / 0.55);
-    }
-    .stat-label {
-        @apply text-sm text-muted;
-    }
-    .stat-value {
-        @apply text-base font-semibold text-app;
-    }
-
-    /* Barres (HP, énergie, etc.) */
-    .bar {
-        @apply h-2 w-full rounded-full overflow-hidden border border-app;
-        background: rgb(var(--bg) / 0.8);
-    }
-    .bar > span {
-        @apply block h-full;
-        background: linear-gradient(90deg, rgb(var(--accent)), rgb(var(--accent-2)));
-        box-shadow: 0 0 18px rgb(var(--accent) / 0.35);
-    }
-}
-
-/* =========================================================
-   Exemple d’usage:
-   <html data-theme="red">  ou  <html data-theme="yellow">
-   ========================================================= */
