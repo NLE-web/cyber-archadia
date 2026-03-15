@@ -1,0 +1,42 @@
+<section class="card card--neon scanlines">
+    <div class="space-y-3">
+        <div class="grid grid-cols-4 gap-3">
+            <a
+                href="{{ path('app_main') }}"
+                class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-app bg-panel p-4 text-center shadow-neon-soft transition hover:bg-panel-2"
+            >
+                <span class="text-lg text-accent text-neon">🜁</span>
+                <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-app leading-tight text-center">
+                    Personnage
+                </span>
+            </a>
+            <a
+                href="{{ path('app_character_skills') }}"
+                class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-app bg-panel p-4 text-center shadow-neon-soft transition hover:bg-panel-2"
+            >
+                <span class="text-lg text-accent text-neon">⛯</span>
+                <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-app leading-tight text-center">
+                    Compétences
+                </span>
+            </a>
+            <a
+                href="{{ path('app_character_items') }}"
+                class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-app bg-panel p-4 text-center shadow-neon-soft transition hover:bg-panel-2"
+            >
+                <span class="text-lg text-accent text-neon">⌘</span>
+                <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-app leading-tight text-center">
+                    Inventaire
+                </span>
+            </a>
+            <a
+                href="{{ path('app_character_actions') }}"
+                class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-app bg-panel p-4 text-center shadow-neon-soft transition hover:bg-panel-2"
+            >
+                <span class="text-lg text-accent text-neon">◈</span>
+                <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-app leading-tight text-center">
+                    Actions
+                </span>
+            </a>
+        </div>
+    </div>
+</section>

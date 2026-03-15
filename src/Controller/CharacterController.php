@@ -14,6 +14,10 @@ final class CharacterController extends AbstractController
     public function majstat(ManagerRegistry $manager, $stat, $math, $value): Response
     {
         $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
+        if (!$character)
+        {
+            return $this->redirectToRoute("app_main");
+        }
         if ($stat == "life")
         {
             if ($math == "add"){
@@ -28,7 +32,73 @@ final class CharacterController extends AbstractController
                 }
             }
         }
+        if ($stat == "cyber")
+        {
+            if ($math == "add"){
+                if ($character->getLostcyber() > 0)
+                {
+                    $character->setLostcyber($character->getLostcyber() - $value);
+                }
+            } else {
+                if ($character->getLostcyber() < $character->getCyberpoints())
+                {
+                    $character->setLostcyber($character->getLostcyber() + $value);
+                }
+            }
+        }
+        if ($stat == "stress")
+        {
+            if ($math == "add"){
+                if ($character->getStresspoints() < $character->getIntelligence() * 5)
+                {
+                    $character->setStresspoints($character->getStresspoints() + $value);
+                }
+            } else {
+                if ($character->getStresspoints() > 0)
+                {
+                    $character->setStresspoints($character->getStresspoints() - $value);
+                }
+            }
+        }
         $manager->getManager()->flush();
         return $this->redirectToRoute("app_main");
+    }
+
+    #[Route('/character/skills', name: 'app_character_skills')]
+    public function characterSkills(ManagerRegistry $manager,)
+    {
+        $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
+        if (!$character)
+        {
+            return $this->redirectToRoute("app_main");
+        }
+        return $this->render('main/skills.html.twig', [
+            "character" => $character,
+        ]);
+    }
+    #[Route('/character/items', name: 'app_character_items')]
+    public function characterItems(ManagerRegistry $manager,)
+    {
+        $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
+        if (!$character)
+        {
+            return $this->redirectToRoute("app_main");
+        }
+        return $this->render('main/items.html.twig', [
+            "character" => $character,
+        ]);
+    }
+
+    #[Route('/character/actions', name: 'app_character_actions')]
+    public function characterActions(ManagerRegistry $manager,)
+    {
+        $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
+        if (!$character)
+        {
+            return $this->redirectToRoute("app_main");
+        }
+        return $this->render('main/actions.html.twig', [
+            "character" => $character,
+        ]);
     }
 }

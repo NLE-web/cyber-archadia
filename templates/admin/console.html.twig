@@ -1,0 +1,55 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content %}
+    <div class="space-y-4">
+        <h1 class="text-2xl font-bold">Console MJ</h1>
+
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {% for character in characters %}
+                {% set currentLife = character.lifepoints - character.lostlife %}
+                {% set currentCyber = character.cyberpoints - character.lostcyber %}
+
+                <div class="rounded-xl border bg-white p-4 shadow-sm">
+                    <div class="mb-3">
+                        <h2 class="text-lg font-semibold">{{ character.nom }}</h2>
+                        <p class="text-sm text-gray-500">
+                            FOR {{ character.force }} · DEX {{ character.dexterite }} · INT {{ character.intelligence }}
+                        </p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span>PV</span>
+                            <span>{{ currentLife }}/{{ character.lifepoints }}</span>
+                        </div>
+
+                        <div class="flex justify-between text-sm">
+                            <span>Cyber</span>
+                            <span>{{ currentCyber }}/{{ character.cyberpoints }}</span>
+                        </div>
+
+                        <div class="flex justify-between text-sm">
+                            <span>Stress</span>
+                            <span>{{ character.stresspoints }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <a href="{{ path('app_maj_stat', {id: character.id, stat: 'life', math: 'add', value: 1}) }}"
+                           class="rounded bg-green-600 px-3 py-1 text-sm text-white">
+                            +1 PV
+                        </a>
+                        <a href="{{ path('app_maj_stat', {id: character.id, stat: 'life', math: 'sub', value: 1}) }}"
+                           class="rounded bg-red-600 px-3 py-1 text-sm text-white">
+                            -1 PV
+                        </a>
+                        <a href="{{ path('app_maj_stat', {id: character.id, stat: 'stress', math: 'add', value: 1}) }}"
+                           class="rounded bg-yellow-500 px-3 py-1 text-sm text-black">
+                            +1 Stress
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

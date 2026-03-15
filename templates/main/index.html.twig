@@ -64,7 +64,6 @@
                                 </span>
                             </div>
                             <div class="flex h-3 w-full overflow-hidden rounded-full border border-app bg-panel">
-
                                 {# SEGMENT VIE #}
                                 <div
                                     class="h-full transition-all duration-300"
@@ -86,24 +85,50 @@
                                     ></div>
                                 {% endif %}
                             </div>
-                            <div class="flex gap-2 pt-1">
+                            <div class="flex items-center justify-between pt-1">
+                                {# Boutons VIE à gauche #}
+                                <div class="flex gap-2">
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'life', math: 'sub', value: 1}) }}"
+                                        style="background: var(--bar-life)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        −
+                                    </a>
 
-                                <a
-                                    href="{{ path('app_maj_stat', {id: character.id, stat: 'life', math: "sub", value: 1}) }}"
-                                    class="flex h-7 w-7 items-center justify-center rounded-full border border-app bg-panel text-sm text-app hover:bg-panel-2"
-                                >
-                                    −
-                                </a>
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'life', math: 'add', value: 1}) }}"
+                                        style="background: var(--bar-life)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        +
+                                    </a>
+                                </div>
 
-                                <a
-                                    href="{{ path('app_maj_stat', {id: character.id, stat: 'life', math: "add", value: 1}) }}"
-                                    class="flex h-7 w-7 items-center justify-center rounded-full border border-app bg-panel text-sm text-app hover:bg-panel-2"
-                                >
-                                    +
-                                </a>
+                                {# Label central optionnel #}
+                                <span class="text-[10px] uppercase tracking-[0.2em] text-muted">Life / Cyber</span>
 
+                                {# Boutons CYBER à droite #}
+                                <div class="flex gap-2">
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'cyber', math: 'sub', value: 1}) }}"
+                                        style="background: linear-gradient(90deg,#6f7d8c,#9fb3c8)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        −
+                                    </a>
+
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'cyber', math: 'add', value: 1}) }}"
+                                        style="background: linear-gradient(90deg,#6f7d8c,#9fb3c8)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        +
+                                    </a>
+                                </div>
                             </div>
                         </div>
+
                         {# ================= STRESS ================= #}
                         <div class="space-y-1">
                             <div class="flex items-center justify-between">
@@ -112,7 +137,7 @@
                                     {{ character.stresspoints }}
                                 </span>
                             </div>
-                            <div class="h-2 w-full rounded-full bg-panel overflow-hidden border border-app">
+                            <div class="h-2 w-full overflow-hidden rounded-full border border-app bg-panel">
                                 <div
                                     class="h-full transition-all duration-300"
                                     style="
@@ -122,10 +147,35 @@
                                         "
                                 ></div>
                             </div>
+
+                            <div class="flex items-center justify-between pt-1">
+                                <div class="flex gap-2">
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'stress', math: 'sub', value: 1}) }}"
+                                        style="background: var(--bar-stress)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        −
+                                    </a>
+
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'stress', math: 'add', value: 1}) }}"
+                                        style="background: var(--bar-stress)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        +
+                                    </a>
+                                </div>
+
+                                <span class="text-[10px] uppercase tracking-[0.2em] text-muted">Stress</span>
+
+                                <div class="w-[72px]"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
+            {% include "main/_nav.html.twig" %}
         </div>
     </div>
 {% endblock %}
