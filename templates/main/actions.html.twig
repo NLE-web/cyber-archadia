@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Actions{% endblock %}
+
+{% block body %}
+    <div class="app-shell max-w-md mx-auto pb-28">
+
+        <header class="app-header mb-4">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.28em] text-muted text-neon">
+                        Edgerunner interface
+                    </p>
+                    <h1 class="text-2xl font-bold text-app">
+                        {{ character.nom }}
+                    </h1>
+                </div>
+            </div>
+        </header>
+
+        <div class="space-y-4">
+            <section class="card card--neon scanlines">
+                <div class="space-y-5">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-[0.24em] text-muted">
+                            Actions
+                        </h2>
+                    </div>
+
+                    {% set typeOrder = ['combat', 'tactique', 'tech', 'objet'] %}
+
+                    {% for typeName in typeOrder %}
+                        {% set hasActionsForType = false %}
+                        {% for characterAction in character.actions %}
+                            {% if characterAction.action.type == typeName %}
+                                {% set hasActionsForType = true %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if hasActionsForType %}
+                            <div class="space-y-3">
+                                <div class="border-b border-app pb-2">
+                                    <h3 class="text-xs font-semibold uppercase tracking-[0.24em] text-muted">
+                                        {{ typeName }}
+                                    </h3>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    {% for characterAction in character.actions %}
+                                        {% if characterAction.action.type == typeName %}
+                                            {% set action = characterAction.action %}
+
+                                            <div class="rounded-2xl border border-app bg-panel p-4 shadow-neon-soft">
+                                                <div class="flex h-full min-h-[140px] flex-col">
+                                                    <div class="flex items-start justify-between gap-3">
+                                                        <div class="min-w-0">
+                                                            <div class="text-sm font-semibold uppercase tracking-[0.16em] text-app">
+                                                                {{ action.name }}
+                                                            </div>
+
+                                                            {% if action.item %}
+                                                                <div class="mt-1 text-[10px] uppercase tracking-[0.14em] text-accent text-neon">
+                                                                    lié à {{ action.item.name }}
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="mt-1 text-[10px] uppercase tracking-[0.14em] text-muted">
+                                                                    action standard
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-3 flex-1 text-xs leading-relaxed text-muted">
+                                                        {{ action.description }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+
+            {% include "main/_nav.html.twig" %}
+        </div>
+    </div>
+{% endblock %}

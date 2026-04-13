@@ -40,6 +40,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Edgerunner::class, mappedBy: 'player')]
     private Collection $edgerunners;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $themeColor = null;
+
     public function __construct()
     {
         $this->edgerunners = new ArrayCollection();
@@ -146,6 +149,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $edgerunner->setPlayer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getThemeColor(): ?string
+    {
+        return $this->themeColor;
+    }
+
+    public function setThemeColor(?string $themeColor): static
+    {
+        $this->themeColor = $themeColor;
 
         return $this;
     }

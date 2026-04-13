@@ -10,232 +10,172 @@
             <div class="flex items-center justify-between gap-3">
                 <div>
                     <p class="text-xs uppercase tracking-[0.28em] text-muted text-neon">Edgerunner interface</p>
-                    <h1 class="text-2xl font-bold text-app">Nyx Vortan</h1>
-                    <p class="text-sm text-muted">Personnage actif</p>
+                    <h1 class="text-2xl font-bold text-app">{{ character.nom }}</h1>
                 </div>
-
-                <span class="badge badge-accent shadow-neon">
-                    En mission
-                </span>
             </div>
         </header>
 
         <div class="space-y-4">
-
             {# SECTION 1 — IDENTITÉ #}
             <section class="card card--neon scanlines">
-                <div class="mb-4">
-                    <h2 class="card-title text-neon">Identité</h2>
-                    <p class="card-subtitle">Profil, attributs et état général</p>
-                </div>
-
                 <div class="space-y-5">
                     <div class="flex justify-center">
                         <div class="relative overflow-hidden rounded-2xl border border-accent bg-panel shadow-neon w-44 h-44">
                             <img
-                                src="{{ asset('uploads/images/avatar.png') }}"
+                                src="{{ asset('uploads/images/'~character.avatar.storageName) }}"
                                 alt="Avatar du personnage"
                                 class="h-full w-full object-cover"
                             >
                             <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-3 gap-3">
                         <div class="rounded-2xl border border-app bg-panel p-4 text-center">
-                            <div class="text-xs uppercase tracking-[0.24em] text-muted">PUI</div>
-                            <div class="mt-2 text-2xl font-bold text-accent text-neon">3</div>
+                            <div class="text-xs uppercase tracking-[0.24em] text-muted">FOR</div>
+                            <div class="mt-2 text-2xl font-bold text-accent text-neon">{{ character.force }}</div>
                         </div>
-
                         <div class="rounded-2xl border border-app bg-panel p-4 text-center">
                             <div class="text-xs uppercase tracking-[0.24em] text-muted">DEX</div>
-                            <div class="mt-2 text-2xl font-bold text-accent text-neon">4</div>
+                            <div class="mt-2 text-2xl font-bold text-accent text-neon">{{ character.dexterite }}</div>
                         </div>
-
                         <div class="rounded-2xl border border-app bg-panel p-4 text-center">
                             <div class="text-xs uppercase tracking-[0.24em] text-muted">INT</div>
-                            <div class="mt-2 text-2xl font-bold text-accent text-neon">2</div>
+                            <div class="mt-2 text-2xl font-bold text-accent text-neon">{{ character.intelligence }}</div>
                         </div>
                     </div>
+                    {% set currentLife = character.lifepoints - character.lostlife %}
+                    {% set lifePercent = (currentLife / (character.lifepoints+character.cyberpoints) * 100) %}
+                    {% set currentCyber = character.cyberpoints - character.lostcyber %}
+                    {% set cyberPercent = (currentCyber / (character.lifepoints+character.cyberpoints) * 100) %}
+                    {% set stressPercent = (character.stresspoints / (character.intelligence * 5) * 100) %}
 
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-semibold text-app">PV</span>
-                            <span class="text-sm text-muted">18 / 24</span>
+                    <div class="space-y-4">
+                        {# ================= LIFE ================= #}
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-semibold text-app">PV</span>
+                                <span class="text-sm text-muted">
+                                    {{ currentLife }}/{{ character.lifepoints }}
+                                    {% if character.cyberpoints > 0 %}
+                                        <span class="ml-2 text-cyan-300">
+                                            + {{ currentCyber }}/{{ character.cyberpoints }}
+                                        </span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="flex h-3 w-full overflow-hidden rounded-full border border-app bg-panel">
+                                {# SEGMENT VIE #}
+                                <div
+                                    class="h-full transition-all duration-300"
+                                    style="
+                                        width: {{ lifePercent }}%;
+                                        background: var(--bar-life);
+                                        box-shadow: 0 0 8px var(--bar-life-glow);
+                                        "
+                                ></div>
+                                {# SEGMENT CYBER #}
+                                {% if currentCyber > 0 %}
+                                    <div
+                                        class="h-full transition-all duration-300"
+                                        style="
+                                            width: {{ cyberPercent }}%;
+                                            background: linear-gradient(90deg,#6f7d8c,#9fb3c8);
+                                            box-shadow: 0 0 8px var(--bar-cyber-glow);
+                                            "
+                                    ></div>
+                                {% endif %}
+                            </div>
+                            <div class="flex items-center justify-between pt-1">
+                                {# Boutons VIE à gauche #}
+                                <div class="flex gap-2">
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'life', math: 'sub', value: 1}) }}"
+                                        style="background: var(--bar-life)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        −
+                                    </a>
+
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'life', math: 'add', value: 1}) }}"
+                                        style="background: var(--bar-life)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        +
+                                    </a>
+                                </div>
+
+                                {# Label central optionnel #}
+                                <span class="text-[10px] uppercase tracking-[0.2em] text-muted">Life / Cyber</span>
+
+                                {# Boutons CYBER à droite #}
+                                <div class="flex gap-2">
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'cyber', math: 'sub', value: 1}) }}"
+                                        style="background: linear-gradient(90deg,#6f7d8c,#9fb3c8)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        −
+                                    </a>
+
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'cyber', math: 'add', value: 1}) }}"
+                                        style="background: linear-gradient(90deg,#6f7d8c,#9fb3c8)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        +
+                                    </a>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="bar h-3">
-                            <span style="width: 75%;"></span>
+                        {# ================= STRESS ================= #}
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-semibold text-app">STRESS</span>
+                                <span class="text-sm text-muted">
+                                    {{ character.stresspoints }}
+                                </span>
+                            </div>
+                            <div class="h-2 w-full overflow-hidden rounded-full border border-app bg-panel">
+                                <div
+                                    class="h-full transition-all duration-300"
+                                    style="
+                                        width: {{ stressPercent }}%;
+                                        background: var(--bar-stress);
+                                        box-shadow: 0 0 8px var(--bar-life-glow);
+                                        "
+                                ></div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-1">
+                                <div class="flex gap-2">
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'stress', math: 'sub', value: 1}) }}"
+                                        style="background: var(--bar-stress)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        −
+                                    </a>
+
+                                    <a
+                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'stress', math: 'add', value: 1}) }}"
+                                        style="background: var(--bar-stress)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                    >
+                                        +
+                                    </a>
+                                </div>
+
+                                <span class="text-[10px] uppercase tracking-[0.2em] text-muted">Stress</span>
+
+                                <div class="w-[72px]"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
-
-            {# SECTION 2 — MODULES #}
-            <section class="card">
-                <div class="mb-4">
-                    <h2 class="card-title">Modules</h2>
-                    <p class="card-subtitle">Équipement, aptitudes et augmentations</p>
-                </div>
-
-                {# Tabs #}
-                <div class="grid grid-cols-3 gap-2 mb-4" role="tablist" aria-label="Modules du personnage">
-                    <button
-                        class="btn btn-primary"
-                        type="button"
-                        data-tab-trigger="inventaire"
-                    >
-                        Inventaire
-                    </button>
-                    <button
-                        class="btn btn-ghost"
-                        type="button"
-                        data-tab-trigger="competences"
-                    >
-                        Compétences
-                    </button>
-                    <button
-                        class="btn btn-ghost"
-                        type="button"
-                        data-tab-trigger="cyber"
-                    >
-                        Cyber
-                    </button>
-                </div>
-
-                <div class="hr-neon mb-4"></div>
-
-                {# Contenu tabs #}
-                <div class="max-h-72 overflow-y-auto pr-1 space-y-3" data-tab-content="inventaire">
-                    <div class="stat-row">
-                        <div>
-                            <div class="stat-value">Pistolet lourd</div>
-                            <div class="stat-label">Arme secondaire</div>
-                        </div>
-                        <span class="badge">Équipé</span>
-                    </div>
-
-                    <div class="stat-row">
-                        <div>
-                            <div class="stat-value">Médikit</div>
-                            <div class="stat-label">Soins rapides</div>
-                        </div>
-                        <span class="badge">x2</span>
-                    </div>
-
-                    <div class="stat-row">
-                        <div>
-                            <div class="stat-value">Clé d’accès chiffrée</div>
-                            <div class="stat-label">Accès sécurisé</div>
-                        </div>
-                        <span class="badge">Rare</span>
-                    </div>
-
-                    <div class="stat-row">
-                        <div>
-                            <div class="stat-value">Grenade IEM</div>
-                            <div class="stat-label">Usage unique</div>
-                        </div>
-                        <span class="badge">x1</span>
-                    </div>
-                </div>
-
-                <div class="hidden max-h-72 overflow-y-auto pr-1 space-y-3" data-tab-content="competences">
-                    <div class="stat-row">
-                        <div>
-                            <div class="stat-value">Tir</div>
-                            <div class="stat-label">Maîtrise offensive</div>
-                        </div>
-                        <span class="badge badge-accent">Niv. 3</span>
-                    </div>
-
-                    <div class="stat-row">
-                        <div>
-                            <div class="stat-value">Infiltration</div>
-                            <div class="stat-label">Discrétion et mouvement</div>
-                        </div>
-                        <span class="badge badge-accent">Niv. 4</span>
-                    </div>
-
-                    <div class="stat-row">
-                        <div>
-                            <div class="stat-value">Hacking</div>
-                            <div class="stat-label">Intrusion systèmes</div>
-                        </div>
-                        <span class="badge badge-accent">Niv. 2</span>
-                    </div>
-                </div>
-
-                <div class="hidden max-h-72 overflow-y-auto pr-1 space-y-3" data-tab-content="cyber">
-                    <div class="stat-row">
-                        <div>
-                            <div class="stat-value">Optiques augmentées</div>
-                            <div class="stat-label">Vision nocturne, zoom x4</div>
-                        </div>
-                        <span class="badge">Actif</span>
-                    </div>
-
-                    <div class="stat-row">
-                        <div>
-                            <div class="stat-value">Interface neurale</div>
-                            <div class="stat-label">Connexion équipements</div>
-                        </div>
-                        <span class="badge">Stable</span>
-                    </div>
-                </div>
-            </section>
-
-            {# NAVIGATION / ACTION RAPIDE #}
-            <section class="card">
-                <div class="mb-4">
-                    <h2 class="card-title">Navigation rapide</h2>
-                    <p class="card-subtitle">Accès direct aux actions principales</p>
-                </div>
-
-                <div class="grid grid-cols-1 gap-3">
-                    <a href="#" class="btn btn-primary w-full">
-                        Voir la mission
-                    </a>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <button class="btn btn-ghost w-full" type="button">
-                            Modifier
-                        </button>
-
-                        <a href="{{ path('app_main_transitiontest') }}" class="btn btn-ghost w-full text-center">
-                            Retour
-                        </a>
-                    </div>
-                </div>
-            </section>
+            {% include "main/_nav.html.twig" %}
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const triggers = document.querySelectorAll('[data-tab-trigger]');
-            const contents = document.querySelectorAll('[data-tab-content]');
-
-            triggers.forEach(trigger => {
-                trigger.addEventListener('click', () => {
-                    const target = trigger.dataset.tabTrigger;
-
-                    triggers.forEach(btn => {
-                        btn.classList.remove('btn-primary');
-                        btn.classList.add('btn-ghost');
-                    });
-
-                    trigger.classList.remove('btn-ghost');
-                    trigger.classList.add('btn-primary');
-
-                    contents.forEach(content => {
-                        if (content.dataset.tabContent === target) {
-                            content.classList.remove('hidden');
-                        } else {
-                            content.classList.add('hidden');
-                        }
-                    });
-                });
-            });
-        });
-    </script>
 {% endblock %}
