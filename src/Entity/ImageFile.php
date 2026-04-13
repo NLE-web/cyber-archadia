@@ -47,4 +47,9 @@ class ImageFile
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->displayName ?? 'Image';
+    }
 }

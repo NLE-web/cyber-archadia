@@ -3,8 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Controller\Admin\ActionCrudController;
+use App\Controller\Admin\EdgerunnerCrudController;
 use App\Controller\Admin\ItemCrudController;
 use App\Controller\Admin\SkillCrudController;
+use App\Entity\Edgerunner;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -27,13 +29,14 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        return [
-            MenuItem::linkToDashboard('Console MJ', 'fa fa-gamepad'),
+        yield MenuItem::linkToDashboard('Console MJ', 'fa fa-gamepad');
 
-            MenuItem::section('Données'),
-            MenuItem::linkTo(ItemCrudController::class, 'Items', 'fa fa-box'),
-            MenuItem::linkTo(ActionCrudController::class, 'Actions', 'fa fa-bolt'),
-            MenuItem::linkTo(SkillCrudController::class, 'Skills', 'fa fa-brain'),
-        ];
+        yield MenuItem::section('Jeu');
+        yield MenuItem::linkTo(EdgerunnerCrudController::class, 'Personnages', 'fa fa-users');
+
+        yield MenuItem::section('Données');
+        yield MenuItem::linkTo(ItemCrudController::class, 'Items', 'fa fa-box');
+        yield MenuItem::linkTo(ActionCrudController::class, 'Actions', 'fa fa-bolt');
+        yield MenuItem::linkTo(SkillCrudController::class, 'Skills', 'fa fa-brain');
     }
 }

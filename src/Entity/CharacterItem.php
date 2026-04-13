@@ -14,9 +14,11 @@ class CharacterItem
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'items')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Edgerunner $character = null;
 
     #[ORM\ManyToOne(inversedBy: 'characterItems')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Item $item = null;
 
     #[ORM\Column]
@@ -61,5 +63,10 @@ class CharacterItem
         $this->amount = $amount;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->item?->getName() ?? 'Item inconnu';
     }
 }

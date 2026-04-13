@@ -39,13 +39,13 @@ class Item
     /**
      * @var Collection<int, CharacterItem>
      */
-    #[ORM\OneToMany(targetEntity: CharacterItem::class, mappedBy: 'item')]
+    #[ORM\OneToMany(targetEntity: CharacterItem::class, mappedBy: 'item', cascade: ['remove'])]
     private Collection $characterItems;
 
     /**
      * @var Collection<int, Action>
      */
-    #[ORM\OneToMany(targetEntity: Action::class, mappedBy: 'item')]
+    #[ORM\OneToMany(targetEntity: Action::class, mappedBy: 'item', cascade: ['remove'])]
     private Collection $actions;
 
     public function __construct()
@@ -201,5 +201,10 @@ class Item
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name ?? 'Objet';
     }
 }

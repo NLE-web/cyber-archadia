@@ -14,10 +14,15 @@ class CharacterAction
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'actions')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Edgerunner $character = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Action $action = null;
+
+    #[ORM\Column]
+    private ?bool $isUsed = null;
 
     public function getId(): ?int
     {
@@ -46,5 +51,22 @@ class CharacterAction
         $this->action = $action;
 
         return $this;
+    }
+
+    public function isUsed(): ?bool
+    {
+        return $this->isUsed;
+    }
+
+    public function setIsUsed(bool $isUsed): static
+    {
+        $this->isUsed = $isUsed;
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->action?->getName() ?? 'Action inconnue';
     }
 }

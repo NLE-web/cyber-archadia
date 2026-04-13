@@ -117,10 +117,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function __serialize(): array
     {
-        $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+        return [
+            'id' => $this->id,
+            'username' => $this->username,
+            'roles' => $this->roles,
+            'password' => isset($this->password) ? hash('crc32c', $this->password) : null,
+            'themeColor' => $this->themeColor,
+        ];
+    }
 
-        return $data;
+    public function __unserialize(array $data): void
+    {
+        $this->id = $data['id'] ?? null;
+        $this->username = $data['username'] ?? null;
+        $this->roles = $data['roles'] ?? [];
+        $this->password = $data['password'] ?? null;
+        $this->themeColor = $data['themeColor'] ?? null;
+        $this->edgerunners = new ArrayCollection();
     }
 
     /**
@@ -163,5 +176,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->themeColor = $themeColor;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->username ?? 'Utilisateur';
     }
 }

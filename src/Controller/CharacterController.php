@@ -97,8 +97,36 @@ final class CharacterController extends AbstractController
         {
             return $this->redirectToRoute("app_main");
         }
+        $actionsArray = [];
+        foreach ($character->getActions() as $action)
+        {
+            $type = $action->getAction()->getType();
+            $actionId = $action->getAction()->getId();
+            
+            if (!isset($actionsArray[$type])) {
+                $actionsArray[$type] = [];
+            }
+            $actionsArray[$type][$actionId] = $action->getAction();
+        }
+        foreach ($character->getItems() as $item)
+        {
+            if ($item->getItem()->getActions() != null)
+            {
+                foreach ($item->getItem()->getActions() as $action)
+                {
+                    $type = $action->getType();
+                    $actionId = $action->getId();
+                    
+                    if (!isset($actionsArray[$type])) {
+                        $actionsArray[$type] = [];
+                    }
+                    $actionsArray[$type][$actionId] = $action;
+                }
+            }
+        }
         return $this->render('main/actions.html.twig', [
             "character" => $character,
+            "actions" => $actionsArray,
         ]);
     }
 }

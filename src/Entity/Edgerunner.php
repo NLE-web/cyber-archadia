@@ -54,19 +54,19 @@ class Edgerunner
     /**
      * @var Collection<int, CharacterSkill>
      */
-    #[ORM\OneToMany(targetEntity: CharacterSkill::class, mappedBy: 'character')]
+    #[ORM\OneToMany(targetEntity: CharacterSkill::class, mappedBy: 'character', cascade: ['persist', 'remove'])]
     private Collection $skills;
 
     /**
      * @var Collection<int, CharacterItem>
      */
-    #[ORM\OneToMany(targetEntity: CharacterItem::class, mappedBy: 'character')]
+    #[ORM\OneToMany(targetEntity: CharacterItem::class, mappedBy: 'character', cascade: ['persist', 'remove'])]
     private Collection $items;
 
     /**
      * @var Collection<int, CharacterAction>
      */
-    #[ORM\OneToMany(targetEntity: CharacterAction::class, mappedBy: 'character')]
+    #[ORM\OneToMany(targetEntity: CharacterAction::class, mappedBy: 'character', cascade: ['persist', 'remove'])]
     private Collection $actions;
 
     public function __construct()
@@ -312,5 +312,10 @@ class Edgerunner
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->nom ?? 'Personnage';
     }
 }

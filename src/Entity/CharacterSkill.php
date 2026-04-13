@@ -14,9 +14,11 @@ class CharacterSkill
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'skills')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Edgerunner $character = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Skill $skill = null;
 
     #[ORM\Column]
@@ -76,5 +78,10 @@ class CharacterSkill
         $this->xp = $xp;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->skill?->getName() ?? 'Compétence inconnue';
     }
 }

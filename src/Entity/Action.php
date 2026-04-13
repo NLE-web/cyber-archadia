@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ActionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ActionRepository::class)]
@@ -24,6 +26,17 @@ class Action
 
     #[ORM\Column(length: 255)]
     private ?string $description = null;
+
+    /**
+     * @var Collection<int, CharacterAction>
+     */
+    #[ORM\OneToMany(targetEntity: CharacterAction::class, mappedBy: 'action', cascade: ['remove'])]
+    private Collection $characterActions;
+
+    public function __construct()
+    {
+        $this->characterActions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -76,5 +89,10 @@ class Action
         $this->description = $description;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name ?? 'Action';
     }
 }
