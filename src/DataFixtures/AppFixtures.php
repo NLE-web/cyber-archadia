@@ -171,42 +171,53 @@ class AppFixtures extends Fixture
         $tirPrecis->setType('combat');
         $tirPrecis->setItem(null);
         $tirPrecis->setDescription('Effectue un tir précis avec une arme balistique.');
+        $tirPrecis->setUsage(Action::USAGE_ACTION);
 
         $attaqueLame = new Action();
         $attaqueLame->setName('Attaque de lame');
         $attaqueLame->setType('combat');
         $attaqueLame->setItem(null);
         $attaqueLame->setDescription('Frappe rapide au corps à corps avec une arme de lame.');
+        $attaqueLame->setUsage(Action::USAGE_RAPIDE);
 
         $hackRapide = new Action();
         $hackRapide->setName('Hack rapide');
         $hackRapide->setType('tech');
         $hackRapide->setItem(null);
         $hackRapide->setDescription('Tente une intrusion rapide sur un système ou un implant.');
+        $hackRapide->setUsage(Action::USAGE_RAPIDE);
+        $hackRapide->setMaxUse(3);
+        $hackRapide->setUses(3);
 
         $couvert = new Action();
         $couvert->setName('Se mettre à couvert');
         $couvert->setType('tactique');
         $couvert->setItem(null);
         $couvert->setDescription('Réduit l’exposition en prenant une position défensive.');
+        $couvert->setUsage(Action::USAGE_RAPIDE);
 
         $lancerGrenade = new Action();
         $lancerGrenade->setName('Lancer grenade');
         $lancerGrenade->setType('objet');
         $lancerGrenade->setItem($grenade);
         $lancerGrenade->setDescription('Lance une grenade frag sur une zone ciblée.');
+        $lancerGrenade->setUsage(Action::USAGE_ACTION);
 
         $utiliserMedkit = new Action();
         $utiliserMedkit->setName('Utiliser medkit');
         $utiliserMedkit->setType('objet');
         $utiliserMedkit->setItem($medkit);
         $utiliserMedkit->setDescription('Utilise un kit de soin pour récupérer des points de vie.');
+        $utiliserMedkit->setUsage(Action::USAGE_RAPIDE);
 
         $injecterStim = new Action();
         $injecterStim->setName('Injecter stimpack');
         $injecterStim->setType('objet');
         $injecterStim->setItem($stim);
         $injecterStim->setDescription('Injecte un stimulant pour obtenir un bonus temporaire.');
+        $injecterStim->setUsage(Action::USAGE_RAPIDE);
+        $injecterStim->setMaxUse(1);
+        $injecterStim->setUses(1);
 
         $characterActionTirPrecis = new CharacterAction();
         $characterActionTirPrecis->setCharacter($edgerunner);

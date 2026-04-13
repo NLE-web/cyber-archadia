@@ -22,7 +22,7 @@ class CharacterAction
     private ?Action $action = null;
 
     #[ORM\Column]
-    private ?bool $isUsed = null;
+    private ?bool $isUsed = false;
 
     public function getId(): ?int
     {

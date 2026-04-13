@@ -10,6 +10,16 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ActionRepository::class)]
 class Action
 {
+    public const USAGE_ACTION = 'action';
+    public const USAGE_RAPIDE = 'rapide';
+    public const USAGE_ONCE_PER_TURN = 'once per turn';
+
+    public const USAGES = [
+        self::USAGE_ACTION => 'Action',
+        self::USAGE_RAPIDE => 'Rapide',
+        self::USAGE_ONCE_PER_TURN => 'Une fois par tour',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -32,6 +42,15 @@ class Action
      */
     #[ORM\OneToMany(targetEntity: CharacterAction::class, mappedBy: 'action', cascade: ['remove'])]
     private Collection $characterActions;
+
+    #[ORM\Column(length: 255)]
+    private ?string $usage = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $maxUse = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $uses = null;
 
     public function __construct()
     {
@@ -94,5 +113,41 @@ class Action
     public function __toString(): string
     {
         return $this->name ?? 'Action';
+    }
+
+    public function getUsage(): ?string
+    {
+        return $this->usage;
+    }
+
+    public function setUsage(string $usage): static
+    {
+        $this->usage = $usage;
+
+        return $this;
+    }
+
+    public function getMaxUse(): ?int
+    {
+        return $this->maxUse;
+    }
+
+    public function setMaxUse(?int $maxUse): static
+    {
+        $this->maxUse = $maxUse;
+
+        return $this;
+    }
+
+    public function getUses(): ?int
+    {
+        return $this->uses;
+    }
+
+    public function setUses(?int $uses): static
+    {
+        $this->uses = $uses;
+
+        return $this;
     }
 }

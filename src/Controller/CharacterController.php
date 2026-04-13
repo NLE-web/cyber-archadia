@@ -98,15 +98,41 @@ final class CharacterController extends AbstractController
             return $this->redirectToRoute("app_main");
         }
         $actionsArray = [];
+        $itemAmounts = [];
+        $characterItemsByItemId = [];
+        foreach ($character->getItems() as $item) {
+            $itemAmounts[$item->getItem()->getId()] = $item->getAmount();
+            $characterItemsByItemId[$item->getItem()->getId()] = $item;
+        }
+
         foreach ($character->getActions() as $action)
         {
-            $type = $action->getAction()->getType();
-            $actionId = $action->getAction()->getId();
+            $actionObj = $action->getAction();
+            $type = $actionObj->getType();
+            $actionId = $actionObj->getId();
             
             if (!isset($actionsArray[$type])) {
                 $actionsArray[$type] = [];
             }
-            $actionsArray[$type][$actionId] = $action->getAction();
+
+            $amount = null;
+            $characterItemId = null;
+            if ($actionObj->getItem() && $actionObj->getItem()->isConsume()) {
+                $itemId = $actionObj->getItem()->getId();
+                $amount = $itemAmounts[$itemId] ?? 0;
+                $characterItemId = isset($characterItemsByItemId[$itemId]) ? $characterItemsByItemId[$itemId]->getId() : null;
+
+                // Si l'objet lié à l'action est consommé et que le solde est <= 0, on n'affiche pas l'action
+                if ($amount <= 0) {
+                    continue;
+                }
+            }
+
+            $actionsArray[$type][$actionId] = [
+                'object' => $actionObj,
+                'amount' => $amount,
+                'characterItemId' => $characterItemId
+            ];
         }
         foreach ($character->getItems() as $item)
         {
@@ -120,7 +146,22 @@ final class CharacterController extends AbstractController
                     if (!isset($actionsArray[$type])) {
                         $actionsArray[$type] = [];
                     }
-                    $actionsArray[$type][$actionId] = $action;
+
+                    $amount = null;
+                    if ($action->getItem() && $action->getItem()->isConsume()) {
+                        $amount = $item->getAmount();
+                        
+                        // Si l'objet est consommé et que le solde est <= 0, on n'affiche pas l'action
+                        if ($amount <= 0) {
+                            continue;
+                        }
+                    }
+
+                    $actionsArray[$type][$actionId] = [
+                        'object' => $action,
+                        'amount' => $amount,
+                        'characterItemId' => $item->getId()
+                    ];
                 }
             }
         }
@@ -128,5 +169,61 @@ final class CharacterController extends AbstractController
             "character" => $character,
             "actions" => $actionsArray,
         ]);
+    }
+
+    #[Route('/character/action/decrement/{id}/{type}', name: 'app_character_action_decrement')]
+    public function decrementAction(ManagerRegistry $manager, int $id, string $type): Response
+    {
+        $entityManager = $manager->getManager();
+        if ($type === 'action') {
+            $action = $entityManager->getRepository(\App\Entity\Action::class)->find($id);
+            if ($action && $action->getUses() > 0) {
+                $action->setUses($action->getUses() - 1);
+            }
+        } elseif ($type === 'item') {
+            $characterItem = $entityManager->getRepository(\App\Entity\CharacterItem::class)->find($id);
+            if ($characterItem && $characterItem->getAmount() > 0) {
+                $characterItem->setAmount($characterItem->getAmount() - 1);
+            }
+        }
+
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_character_actions');
+    }
+
+    #[Route('/character/actions/reset', name: 'app_character_actions_reset')]
+    public function resetActions(ManagerRegistry $manager): Response
+    {
+        $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
+        if (!$character) {
+            return $this->redirectToRoute("app_main");
+        }
+
+        $entityManager = $manager->getManager();
+        
+        // Reset direct character actions
+        foreach ($character->getActions() as $characterAction) {
+            $action = $characterAction->getAction();
+            if ($action && $action->getMaxUse() !== null) {
+                $action->setUses($action->getMaxUse());
+            }
+        }
+
+        // Reset actions from character items
+        foreach ($character->getItems() as $characterItem) {
+            $item = $characterItem->getItem();
+            if ($item) {
+                foreach ($item->getActions() as $action) {
+                    if ($action->getMaxUse() !== null) {
+                        $action->setUses($action->getMaxUse());
+                    }
+                }
+            }
+        }
+
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_character_actions');
     }
 }

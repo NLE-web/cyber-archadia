@@ -5,7 +5,9 @@ namespace App\Controller\Admin;
 use App\Entity\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class ActionCrudController extends AbstractCrudController
@@ -22,6 +24,8 @@ class ActionCrudController extends AbstractCrudController
             TextField::new('name', 'Nom'),
             TextField::new('type', 'Type'),
             TextField::new('description', 'Description'),
+            ChoiceField::new('usage', 'Usage')->setChoices(Action::USAGES),
+            IntegerField::new('maxUse', 'Max Utilisations'),
             AssociationField::new('item', 'Item lié'),
         ];
     }
