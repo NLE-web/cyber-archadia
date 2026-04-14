@@ -14,10 +14,13 @@ class Action
     public const USAGE_RAPIDE = 'rapide';
     public const USAGE_ONCE_PER_TURN = 'once per turn';
 
+    public const USAGE_REACTION = 'reaction';
+
     public const USAGES = [
         self::USAGE_ACTION => 'Action',
         self::USAGE_RAPIDE => 'Rapide',
         self::USAGE_ONCE_PER_TURN => 'Une fois par tour',
+        self::USAGE_REACTION => 'Réaction',
     ];
 
     #[ORM\Id]
