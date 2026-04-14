@@ -6,6 +6,7 @@ use App\Entity\Item;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -22,9 +23,11 @@ class ItemCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             TextField::new('name', 'Nom'),
-            TextField::new('type', 'Type'),
+            ChoiceField::new('type', 'Type')->setChoices(Item::TYPES),
+            BooleanField::new('isLegal', 'Légal'),
+            BooleanField::new('isCumbersome', 'Encombrant'),
             AssociationField::new('illustration', 'Illustration'),
-            BooleanField::new('isConsume', 'Consommable'),
+            BooleanField::new('isConsume', 'Consommable (Mécanique d\'usage)'),
             IntegerField::new('price', 'Prix'),
             IntegerField::new('chargePrice', 'Prix de recharge'),
             TextField::new('description', 'Description'),

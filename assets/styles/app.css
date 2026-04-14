@@ -248,6 +248,18 @@
     background: linear-gradient(90deg, transparent, rgb(var(--accent) / 0.75), transparent);
 }
 
+@utility icon-dragon {
+    mask-image: url('../img-asset/dragon.png');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    background-color: currentColor;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+}
+
 @utility scanlines {
     background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.03) 1px, transparent 1px);
     background-size: 100% 6px;

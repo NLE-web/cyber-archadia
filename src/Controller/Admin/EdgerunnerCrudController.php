@@ -35,21 +35,29 @@ class EdgerunnerCrudController extends AbstractCrudController
             IntegerField::new('lostlife', 'Vie perdue'),
             IntegerField::new('lostcyber', 'Cyber perdu'),
             BooleanField::new('isActive', 'Actif'),
+            IntegerField::new('money', 'Argent'),
             AssociationField::new('avatar'),
+            AssociationField::new('player', 'Joueur'),
             
             CollectionField::new('items', 'Inventaire')
                 ->setEntryIsComplex(true)
                 ->setEntryType(CharacterItemType::class)
+                ->allowAdd()
+                ->allowDelete()
                 ->onlyOnForms(),
 
             CollectionField::new('actions', 'Actions')
                 ->setEntryIsComplex(true)
                 ->setEntryType(CharacterActionType::class)
+                ->allowAdd()
+                ->allowDelete()
                 ->onlyOnForms(),
 
             CollectionField::new('skills', 'Compétences')
                 ->setEntryIsComplex(true)
                 ->setEntryType(CharacterSkillType::class)
+                ->allowAdd()
+                ->allowDelete()
                 ->onlyOnForms(),
         ];
     }

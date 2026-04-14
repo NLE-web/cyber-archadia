@@ -21,7 +21,7 @@ class CharacterItem
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Item $item = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $amount = null;
 
     public function getId(): ?int
@@ -58,7 +58,7 @@ class CharacterItem
         return $this->amount;
     }
 
-    public function setAmount(int $amount): static
+    public function setAmount(?int $amount): static
     {
         $this->amount = $amount;
 

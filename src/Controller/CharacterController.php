@@ -2,17 +2,61 @@
 
 namespace App\Controller;
 
+use App\Entity\Action;
+use App\Entity\CharacterAction;
+use App\Entity\CharacterItem;
 use App\Entity\Edgerunner;
+use App\Entity\Item;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class CharacterController extends AbstractController
 {
-    #[Route('/character/majstat/{stat}/{math}/{value}', name: 'app_maj_stat')]
-    public function majstat(ManagerRegistry $manager, $stat, $math, $value): Response
+    #[Route('/character/item/{id}/{math}', name: 'app_character_item_quantity')]
+    public function updateItemQuantity(ManagerRegistry $manager, CharacterItem $characterItem, string $math): Response
     {
+        $character = $characterItem->getCharacter();
+        
+        // Sécurité : Vérifier que le personnage appartient à l'utilisateur
+        if ($character->getPlayer() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $item = $characterItem->getItem();
+
+        if ($math === 'add') {
+            // Seuls les objets consommables peuvent être réachetés
+            if ($item->getType() !== Item::TYPE_CONSOMMABLE) {
+                return $this->redirectToRoute('app_character_items');
+            }
+            
+            $price = $item->getPrice() ?? 0;
+            if ($character->getMoney() >= $price) {
+                $characterItem->setAmount(($characterItem->getAmount() ?? 0) + 1);
+                $character->setMoney($character->getMoney() - $price);
+            }
+        } elseif ($math === 'sub') {
+            if (($characterItem->getAmount() ?? 0) > 0) {
+                $characterItem->setAmount($characterItem->getAmount() - 1);
+            }
+        }
+
+        $manager->getManager()->flush();
+
+        return $this->redirectToRoute('app_character_items');
+    }
+
+    #[Route('/character/majstat/{stat}/{math}/{value}', name: 'app_maj_stat', methods: ['GET', 'POST'])]
+    public function majstat(ManagerRegistry $manager, Request $request, $stat, $math = null, $value = null): Response
+    {
+        if ($request->isMethod('POST')) {
+            $math = $request->request->get('math');
+            $value = (int) $request->request->get('value');
+        }
+
         $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
         if (!$character)
         {
@@ -58,6 +102,14 @@ final class CharacterController extends AbstractController
                 {
                     $character->setStresspoints($character->getStresspoints() - $value);
                 }
+            }
+        }
+        if ($stat == "money")
+        {
+            if ($math == "add"){
+                $character->setMoney($character->getMoney() + $value);
+            } else {
+                $character->setMoney(max(0, $character->getMoney() - $value));
             }
         }
         $manager->getManager()->flush();

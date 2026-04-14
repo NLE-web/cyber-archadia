@@ -52,6 +52,7 @@ class AppFixtures extends Fixture
         $edgerunner->setIsActive(true);
         $edgerunner->setPlayer($user);
         $edgerunner->setAvatar($avatar);
+        $edgerunner->setMoney(5000);
 
         $hacking = new Skill();
         $hacking->setName('hacking');
@@ -89,48 +90,82 @@ class AppFixtures extends Fixture
 
         $grenade = new Item();
         $grenade->setName('Grenade frag');
-        $grenade->setType('consommable');
+        $grenade->setType(Item::TYPE_CONSOMMABLE);
         $grenade->setIllustration($itemIllustration);
         $grenade->setIsConsume(true);
         $grenade->setPrice(120);
         $grenade->setChargePrice(120);
         $grenade->setDescription('Grenade explosive à fragmentation');
+        $grenade->setIsLegal(false);
+        $grenade->setIsCumbersome(false);
 
         $medkit = new Item();
         $medkit->setName('Medkit');
-        $medkit->setType('soin');
+        $medkit->setType(Item::TYPE_CONSOMMABLE);
         $medkit->setIllustration($itemIllustration);
         $medkit->setIsConsume(true);
         $medkit->setPrice(90);
         $medkit->setChargePrice(90);
         $medkit->setDescription('Kit de soin portable');
+        $medkit->setIsLegal(true);
+        $medkit->setIsCumbersome(false);
 
         $ammo = new Item();
         $ammo->setName('Munitions 9mm');
-        $ammo->setType('munition');
+        $ammo->setType(Item::TYPE_CONSOMMABLE);
         $ammo->setIllustration($itemIllustration);
         $ammo->setIsConsume(true);
         $ammo->setPrice(35);
         $ammo->setChargePrice(35);
         $ammo->setDescription('Boîte de munitions standard');
+        $ammo->setIsLegal(true);
+        $ammo->setIsCumbersome(false);
 
         $lockpick = new Item();
         $lockpick->setName('Kit de crochetage');
-        $lockpick->setType('outil');
+        $lockpick->setType(Item::TYPE_DIVERS);
         $lockpick->setIllustration($itemIllustration);
         $lockpick->setIsConsume(false);
         $lockpick->setPrice(150);
         $lockpick->setChargePrice(0);
         $lockpick->setDescription('Outil de piratage mécanique discret');
+        $lockpick->setIsLegal(false);
+        $lockpick->setIsCumbersome(false);
 
         $stim = new Item();
         $stim->setName('Stimpack');
-        $stim->setType('boost');
+        $stim->setType(Item::TYPE_CONSOMMABLE);
         $stim->setIllustration($itemIllustration);
         $stim->setIsConsume(true);
         $stim->setPrice(75);
         $stim->setChargePrice(75);
         $stim->setDescription('Injecteur de stimulation nerveuse');
+        $stim->setIsLegal(true);
+        $stim->setIsCumbersome(false);
+
+        $katana = new Item();
+        $katana->setName('Katana thermique');
+        $katana->setType(Item::TYPE_EQUIPEMENT);
+        $katana->setIllustration($itemIllustration);
+        $katana->setIsConsume(false);
+        $katana->setPrice(1200);
+        $katana->setChargePrice(0);
+        $katana->setDescription('Lame élégante capable de trancher l\'acier.');
+        $katana->setIsLegal(false);
+        $katana->setIsCumbersome(true);
+        $manager->persist($katana);
+
+        $vest = new Item();
+        $vest->setName('Veste pare-balles');
+        $vest->setType(Item::TYPE_EQUIPEMENT);
+        $vest->setIllustration($itemIllustration);
+        $vest->setIsConsume(false);
+        $vest->setPrice(450);
+        $vest->setChargePrice(0);
+        $vest->setDescription('Protection standard contre les petits calibres.');
+        $vest->setIsLegal(true);
+        $vest->setIsCumbersome(true);
+        $manager->persist($vest);
 
         $characterGrenade = new CharacterItem();
         $characterGrenade->setCharacter($edgerunner);
@@ -156,6 +191,11 @@ class AppFixtures extends Fixture
         $characterStim->setCharacter($edgerunner);
         $characterStim->setItem($stim);
         $characterStim->setAmount(2);
+
+        $characterKatana = new CharacterItem();
+        $characterKatana->setCharacter($edgerunner);
+        $characterKatana->setItem($katana);
+        $characterKatana->setAmount(1);
 
         $edgerunner->addItem($characterGrenade);
         $edgerunner->addItem($characterMedkit);

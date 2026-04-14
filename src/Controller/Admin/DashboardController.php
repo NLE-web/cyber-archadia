@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\ActionCrudController;
 use App\Controller\Admin\EdgerunnerCrudController;
+use App\Controller\Admin\ImageFileCrudController;
 use App\Controller\Admin\ItemCrudController;
 use App\Controller\Admin\SkillCrudController;
 use App\Entity\Edgerunner;
@@ -38,5 +39,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(ItemCrudController::class, 'Items', 'fa fa-box');
         yield MenuItem::linkTo(ActionCrudController::class, 'Actions', 'fa fa-bolt');
         yield MenuItem::linkTo(SkillCrudController::class, 'Skills', 'fa fa-brain');
+        yield MenuItem::linkTo(ImageFileCrudController::class, 'Images', 'fa fa-image');
     }
 }

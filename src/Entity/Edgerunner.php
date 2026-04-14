@@ -69,6 +69,9 @@ class Edgerunner
     #[ORM\OneToMany(targetEntity: CharacterAction::class, mappedBy: 'character', cascade: ['persist', 'remove'])]
     private Collection $actions;
 
+    #[ORM\Column]
+    private ?int $money = null;
+
     public function __construct()
     {
         $this->skills = new ArrayCollection();
@@ -317,5 +320,17 @@ class Edgerunner
     public function __toString(): string
     {
         return $this->nom ?? 'Personnage';
+    }
+
+    public function getMoney(): ?int
+    {
+        return $this->money;
+    }
+
+    public function setMoney(int $money): static
+    {
+        $this->money = $money;
+
+        return $this;
     }
 }

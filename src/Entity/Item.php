@@ -10,6 +10,16 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
 class Item
 {
+    public const TYPE_CONSOMMABLE = 'consommable';
+    public const TYPE_EQUIPEMENT = 'equipement';
+    public const TYPE_DIVERS = 'divers';
+
+    public const TYPES = [
+        self::TYPE_CONSOMMABLE => 'Consommable',
+        self::TYPE_EQUIPEMENT => 'Équipement',
+        self::TYPE_DIVERS => 'Divers',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -47,6 +57,12 @@ class Item
      */
     #[ORM\OneToMany(targetEntity: Action::class, mappedBy: 'item', cascade: ['remove'])]
     private Collection $actions;
+
+    #[ORM\Column]
+    private ?bool $isLegal = null;
+
+    #[ORM\Column]
+    private ?bool $isCumbersome = null;
 
     public function __construct()
     {
@@ -206,5 +222,29 @@ class Item
     public function __toString(): string
     {
         return $this->name ?? 'Objet';
+    }
+
+    public function isLegal(): ?bool
+    {
+        return $this->isLegal;
+    }
+
+    public function setIsLegal(bool $isLegal): static
+    {
+        $this->isLegal = $isLegal;
+
+        return $this;
+    }
+
+    public function isCumbersome(): ?bool
+    {
+        return $this->isCumbersome;
+    }
+
+    public function setIsCumbersome(bool $isCumbersome): static
+    {
+        $this->isCumbersome = $isCumbersome;
+
+        return $this;
     }
 }

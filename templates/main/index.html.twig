@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import "_macros.html.twig" as macros %}
 
 {% block title %}Fiche personnage{% endblock %}
 
@@ -43,6 +44,55 @@
                             <div class="mt-2 text-2xl font-bold text-accent text-neon">{{ character.intelligence }}</div>
                         </div>
                     </div>
+
+                    {# SECTION ARGENT #}
+                    <div class="rounded-2xl border border-app bg-panel-2 p-4 text-center">
+                        <div class="text-[10px] uppercase tracking-[0.24em] text-muted">Dragons</div>
+                        <div class="mt-2 flex items-center justify-center gap-2 text-2xl font-bold text-accent text-neon">
+                            {{ character.money|number_format(0, '.', ' ') }}
+                            {{ macros.dragon('w-6 h-6') }}
+                        </div>
+
+                        <details class="group mt-4">
+                            <summary class="flex cursor-pointer list-none items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted transition-colors hover:text-accent">
+                                <span class="group-open:hidden">Modifier le solde</span>
+                                <span class="hidden group-open:inline">Fermer l'interface</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </summary>
+
+                            <form action="{{ path('app_maj_stat', {stat: 'money'}) }}" method="POST" class="mt-4 flex items-center justify-center gap-2">
+                                <input
+                                    type="number"
+                                    name="value"
+                                    value="100"
+                                    min="1"
+                                    class="w-20 rounded-lg border border-app bg-panel px-2 py-1 text-center text-sm font-bold text-app shadow-neon-soft focus:border-accent focus:outline-none"
+                                    required
+                                >
+                                <div class="flex gap-2">
+                                    <button
+                                        type="submit"
+                                        name="math"
+                                        value="sub"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app bg-panel text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2 active:scale-95 transition-transform"
+                                    >
+                                        −
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        name="math"
+                                        value="add"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app bg-panel text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2 active:scale-95 transition-transform"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </form>
+                        </details>
+                    </div>
+
                     {% set currentLife = character.lifepoints - character.lostlife %}
                     {% set lifePercent = (currentLife / (character.lifepoints+character.cyberpoints) * 100) %}
                     {% set currentCyber = character.cyberpoints - character.lostcyber %}
