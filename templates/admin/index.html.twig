@@ -1,11 +1,249 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
-{% block content %}
-    <div class="space-y-4">
-        <h1 class="text-2xl font-bold">Console MJ</h1>
+{% block content_title %}Console MJ - Flux d'activité générale{% endblock %}
 
-        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+{% block main %}
+    <style>
+        .badge { display: inline-block; padding: 0.25em 0.4em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; }
+        .badge-success { color: #fff; background-color: #1e7e34; }
+        .badge-danger { color: #fff; background-color: #bd2130; }
+        .badge-info { color: #fff; background-color: #117a8b; }
+        .badge-warning { color: #212529; background-color: #e0a800; }
+        .badge-secondary { color: #fff; background-color: #545b62; }
+        .critical-row { border-left: 4px solid #e0a800; background-color: rgba(224, 168, 0, 0.1); }
+        .text-muted { color: #555 !important; }
+        .font-monospace { font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        .small { font-size: 80%; }
+        .table { width: 100%; margin-bottom: 1rem; color: #212529; border-collapse: collapse; }
+        .table th, .table td { padding: 0.75rem; vertical-align: top; border-top: 1px solid #dee2e6; }
+        .card { position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; }
+        .card-header { padding: .75rem 1.25rem; margin-bottom: 0; background-color: rgba(0,0,0,.03); border-bottom: 1px solid rgba(0,0,0,.125); }
+        .bg-dark { background-color: #1a1d20 !important; }
+        .bg-info { background-color: #0b5ed7 !important; }
+        .text-white { color: #fff !important; }
+        .alert { position: relative; padding: .75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: .25rem; }
+        .alert-success { color: #0f5132; background-color: #d1e7dd; border-color: #badbcc; }
+        .alert-info { color: #055160; background-color: #cff4fc; border-color: #b6effb; }
+        .alert-danger { color: #842029; background-color: #f8d7da; border-color: #f5c2c7; }
+        #logs-container tr { transition: background-color 2s ease; }
+        #logs-container tr.hidden-log { display: none; }
+        .filter-input { width: 100%; padding: 4px 8px; font-size: 12px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px; }
+        .btn-toggle { cursor: pointer; padding: 2px 8px; border-radius: 4px; border: 1px solid #fff; background: transparent; color: #fff; font-size: 12px; }
+        .btn-toggle:hover { background: rgba(255,255,255,0.1); }
+    </style>
 
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-dark text-white" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h5 class="mb-0" style="margin:0; color: white; font-weight: bold; letter-spacing: 1px;">LOGS D'ACTIVITÉ EN DIRECT</h5>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="toggle-all-logs" class="btn-toggle">Limiter à 20</button>
+                        <button id="collapse-logs" class="btn-toggle" title="Réduire/Agrandir">_</button>
+                    </div>
+                </div>
+                <div id="logs-card-content" class="card-body p-0">
+                    <div style="overflow-x: auto;">
+                        <table class="table table-hover mb-0" id="logs-table">
+                            <thead style="background-color: #f8f9fa;">
+                                <tr>
+                                    <th style="width: 100px;">Heure</th>
+                                    <th>
+                                        Personnage
+                                        <input type="text" class="filter-input" data-col="1" placeholder="Filtrer...">
+                                    </th>
+                                    <th>
+                                        Valeur
+                                        <input type="text" class="filter-input" data-col="2" placeholder="Filtrer...">
+                                    </th>
+                                    <th>
+                                        Description
+                                        <input type="text" class="filter-input" data-col="3" placeholder="Filtrer...">
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-container">
+                                {% for log in latestLogs %}
+                                    {% set isCritical = log.isCritical %}
+                                    <tr class="{{ isCritical ? 'critical-row' : '' }}">
+                                        <td class="text-muted font-monospace small" data-val="{{ log.createdAt|date('H:i:s') }}">{{ log.createdAt|date('H:i:s') }}</td>
+                                        <td data-val="{{ log.character.nom }}"><strong>{{ log.character.nom }}</strong></td>
+                                        <td data-val="{{ log.amount is not null ? (log.amount > 0 ? '+' : '') ~ log.amount : (isCritical ? 'Critical' : 'Event') }}">
+                                            {% if log.amount is not null %}
+                                                <span class="badge {{ log.amount > 0 ? 'badge-success' : 'badge-danger' }}">
+                                                    {{ log.amount > 0 ? '+' : '' }}{{ log.amount }}
+                                                </span>
+                                            {% elseif isCritical %}
+                                                <span class="badge badge-warning">Critical</span>
+                                            {% else %}
+                                                <span class="badge badge-secondary">Event</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="{{ isCritical ? 'text-dark font-weight-bold' : 'text-muted' }}" style="font-style: italic;" data-val="{{ log.description }}">{{ log.description }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr id="no-logs">
+                                        <td colspan="4" class="text-center py-4 text-muted">Aucun log récent.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('logs-container');
+            const collapseBtn = document.getElementById('collapse-logs');
+            const content = document.getElementById('logs-card-content');
+            const toggleAllBtn = document.getElementById('toggle-all-logs');
+            const url = "{{ mercure_url|raw }}";
+            
+            let showAll = true;
+            const LOG_LIMIT = 20;
+
+            // Masquage complet
+            collapseBtn.addEventListener('click', () => {
+                if (content.style.display === 'none') {
+                    content.style.display = 'block';
+                    collapseBtn.innerText = '_';
+                } else {
+                    content.style.display = 'none';
+                    collapseBtn.innerText = '□';
+                }
+            });
+
+            // Afficher tout / Limiter
+            toggleAllBtn.addEventListener('click', () => {
+                showAll = !showAll;
+                toggleAllBtn.innerText = showAll ? 'Limiter à 20' : 'Afficher tout';
+                updateVisibleLogs();
+            });
+
+            function updateVisibleLogs() {
+                const rows = Array.from(container.querySelectorAll('tr:not(#no-logs)'));
+                rows.forEach((row, index) => {
+                    if (showAll || index < LOG_LIMIT) {
+                        row.classList.remove('hidden-log');
+                    } else {
+                        row.classList.add('hidden-log');
+                    }
+                });
+                applyFilters(); // Réappliquer les filtres après changement de visibilité
+            }
+
+            // Filtrage
+            const filters = document.querySelectorAll('.filter-input');
+            filters.forEach(input => {
+                input.addEventListener('input', applyFilters);
+            });
+
+            function applyFilters() {
+                const rows = Array.from(container.querySelectorAll('tr:not(#no-logs)'));
+                const filterValues = Array.from(filters).map(f => f.value.toLowerCase());
+
+                rows.forEach((row, index) => {
+                    // Si on limite à 20, on ne regarde que les 20 premiers de base (ou on filtre sur tout ?)
+                    // Généralement on filtre sur ce qui est "potentiellement" visible.
+                    // Ici on va filtrer sur TOUTES les lignes, mais respecter la limite de 20 résultats SI showAll est faux.
+                    
+                    let matches = true;
+                    filterValues.forEach((val, i) => {
+                        if (val) {
+                            const cell = row.cells[i+1]; // i+1 car la colonne 0 est l'heure et n'a pas de filtre ici
+                            const cellText = cell ? cell.getAttribute('data-val').toLowerCase() : '';
+                            if (!cellText.includes(val)) matches = false;
+                        }
+                    });
+
+                    if (matches) {
+                        row.dataset.filtered = "true";
+                    } else {
+                        row.dataset.filtered = "false";
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Gérer la limite de 20 sur les résultats filtrés
+                let visibleCount = 0;
+                rows.forEach(row => {
+                    if (row.dataset.filtered === "true") {
+                        if (showAll || visibleCount < LOG_LIMIT) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            }
+
+            const eventSource = new EventSource(url);
+
+            eventSource.onopen = () => {
+            };
+
+            eventSource.onerror = (e) => {
+                console.error('Mercure Error:', e);
+            };
+
+            eventSource.onmessage = event => {
+                const data = JSON.parse(event.data);
+                
+                const noLogs = document.getElementById('no-logs');
+                if (noLogs) {
+                    noLogs.remove();
+                }
+
+                const tr = document.createElement('tr');
+                
+                const isCritical = data.isCritical === true;
+                
+                if (isCritical) {
+                    tr.className = 'critical-row';
+                    tr.style.backgroundColor = 'rgba(224, 168, 0, 0.2)';
+                } else {
+                    tr.style.backgroundColor = 'rgba(0, 255, 170, 0.2)';
+                }
+                
+                let valueContent = '';
+                let dataValValue = '';
+                if (data.amount !== null && data.amount !== undefined) {
+                    const badgeClass = data.amount > 0 ? 'badge-success' : 'badge-danger';
+                    const sign = data.amount > 0 ? '+' : '';
+                    valueContent = `<span class="badge ${badgeClass}">${sign}${data.amount}</span>`;
+                    dataValValue = `${sign}${data.amount}`;
+                } else if (isCritical) {
+                    valueContent = `<span class="badge badge-warning">Critical</span>`;
+                    dataValValue = 'Critical';
+                } else {
+                    valueContent = `<span class="badge badge-secondary">Event</span>`;
+                    dataValValue = 'Event';
+                }
+
+                const descClass = isCritical ? 'text-dark font-weight-bold' : 'text-muted';
+
+                tr.innerHTML = `
+                    <td class="text-muted font-monospace small" data-val="${data.date}">${data.date}</td>
+                    <td data-val="${data.character}"><strong>${data.character}</strong></td>
+                    <td data-val="${dataValValue}">${valueContent}</td>
+                    <td class="${descClass}" style="font-style: italic;" data-val="${data.description}">${data.description}</td>
+                `;
+
+                container.insertBefore(tr, container.firstChild);
+                
+                setTimeout(() => {
+                    tr.style.backgroundColor = isCritical ? 'rgba(224, 168, 0, 0.1)' : 'transparent';
+                }, 2000);
+
+                updateVisibleLogs();
+            };
+
+            // Init
+            updateVisibleLogs();
+        });
+    </script>
 {% endblock %}
