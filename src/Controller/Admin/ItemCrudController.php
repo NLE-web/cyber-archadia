@@ -31,6 +31,10 @@ class ItemCrudController extends AbstractCrudController
             IntegerField::new('price', 'Prix'),
             IntegerField::new('chargePrice', 'Prix de recharge'),
             TextField::new('description', 'Description'),
+            IntegerField::new('stock', 'Stock'),
+            BooleanField::new('isInfiniteStock', 'Stock infini'),
+            IntegerField::new('humanityLoss', 'Perte d\'Humanité'),
+            BooleanField::new('installed', 'Installé (Cyberware)'),
             AssociationField::new('actions', 'Actions liées'),
         ];
     }

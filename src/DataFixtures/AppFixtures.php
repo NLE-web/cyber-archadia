@@ -4,9 +4,11 @@ namespace App\DataFixtures;
 
 use App\Entity\Action;
 use App\Entity\CharacterAction;
+use App\Entity\CharacterFeat;
 use App\Entity\CharacterItem;
 use App\Entity\CharacterSkill;
 use App\Entity\Edgerunner;
+use App\Entity\Feat;
 use App\Entity\ImageFile;
 use App\Entity\Item;
 use App\Entity\Skill;
@@ -31,20 +33,30 @@ class AppFixtures extends Fixture
             $this->passwordHasher->hashPassword($user, 'password')
         );
 
+        $userNoChar = new User();
+        $userNoChar->setUsername('new_player');
+        $userNoChar->setRoles(['ROLE_USER']);
+        $userNoChar->setPassword(
+            $this->passwordHasher->hashPassword($userNoChar, 'password')
+        );
+        $manager->persist($userNoChar);
+
         $avatar = new ImageFile();
         $avatar->setDisplayName('Avatar principal');
         $avatar->setStorageName('avatar.png');
+        $manager->persist($avatar);
 
         $itemIllustration = new ImageFile();
         $itemIllustration->setDisplayName('Illustration objet');
         $itemIllustration->setStorageName('item.png');
+        $manager->persist($itemIllustration);
 
         $edgerunner = new Edgerunner();
         $edgerunner->setNom('Vex');
         $edgerunner->setForce(6);
         $edgerunner->setDexterite(8);
         $edgerunner->setIntelligence(7);
-        $edgerunner->setLifepoints(20);
+        $edgerunner->setLifepoints(18); // FOR 6 * 3
         $edgerunner->setCyberpoints(5);
         $edgerunner->setStresspoints(0);
         $edgerunner->setLostlife(4);
@@ -53,36 +65,38 @@ class AppFixtures extends Fixture
         $edgerunner->setPlayer($user);
         $edgerunner->setAvatar($avatar);
         $edgerunner->setMoney(5000);
+        $edgerunner->setXp(20);
+        $edgerunner->setHumanityLoss(0);
 
         $hacking = new Skill();
         $hacking->setName('hacking');
         $hacking->setMainStat('intelligence');
+        $hacking->setXpcost(10);
 
         $lame = new Skill();
         $lame->setName('lame');
         $lame->setMainStat('dexterite');
+        $lame->setXpcost(8);
 
         $ballistique = new Skill();
         $ballistique->setName('ballistique');
         $ballistique->setMainStat('dexterite');
+        $ballistique->setXpcost(12);
 
         $characterSkillHacking = new CharacterSkill();
         $characterSkillHacking->setCharacter($edgerunner);
         $characterSkillHacking->setSkill($hacking);
         $characterSkillHacking->setLevel(3);
-        $characterSkillHacking->setXp(120);
 
         $characterSkillLame = new CharacterSkill();
         $characterSkillLame->setCharacter($edgerunner);
         $characterSkillLame->setSkill($lame);
         $characterSkillLame->setLevel(2);
-        $characterSkillLame->setXp(65);
 
         $characterSkillBallistique = new CharacterSkill();
         $characterSkillBallistique->setCharacter($edgerunner);
         $characterSkillBallistique->setSkill($ballistique);
         $characterSkillBallistique->setLevel(4);
-        $characterSkillBallistique->setXp(210);
 
         $edgerunner->addSkill($characterSkillHacking);
         $edgerunner->addSkill($characterSkillLame);
@@ -98,6 +112,8 @@ class AppFixtures extends Fixture
         $grenade->setDescription('Grenade explosive à fragmentation');
         $grenade->setIsLegal(false);
         $grenade->setIsCumbersome(false);
+        $grenade->setStock(10);
+        $grenade->setIsInfiniteStock(false);
 
         $medkit = new Item();
         $medkit->setName('Medkit');
@@ -109,6 +125,7 @@ class AppFixtures extends Fixture
         $medkit->setDescription('Kit de soin portable');
         $medkit->setIsLegal(true);
         $medkit->setIsCumbersome(false);
+        $medkit->setIsInfiniteStock(true);
 
         $ammo = new Item();
         $ammo->setName('Munitions 9mm');
@@ -212,6 +229,8 @@ class AppFixtures extends Fixture
         $tirPrecis->setItem(null);
         $tirPrecis->setDescription('Effectue un tir précis avec une arme balistique.');
         $tirPrecis->setUsage(Action::USAGE_ACTION);
+        $tirPrecis->setCout(2);
+        $manager->persist($tirPrecis);
 
         $attaqueLame = new Action();
         $attaqueLame->setName('Attaque de lame');
@@ -219,6 +238,8 @@ class AppFixtures extends Fixture
         $attaqueLame->setItem(null);
         $attaqueLame->setDescription('Frappe rapide au corps à corps avec une arme de lame.');
         $attaqueLame->setUsage(Action::USAGE_RAPIDE);
+        $attaqueLame->setCout(1);
+        $manager->persist($attaqueLame);
 
         $hackRapide = new Action();
         $hackRapide->setName('Hack rapide');
@@ -228,6 +249,8 @@ class AppFixtures extends Fixture
         $hackRapide->setUsage(Action::USAGE_RAPIDE);
         $hackRapide->setMaxUse(3);
         $hackRapide->setUses(3);
+        $hackRapide->setCout(1);
+        $manager->persist($hackRapide);
 
         $couvert = new Action();
         $couvert->setName('Se mettre à couvert');
@@ -235,6 +258,8 @@ class AppFixtures extends Fixture
         $couvert->setItem(null);
         $couvert->setDescription('Réduit l’exposition en prenant une position défensive.');
         $couvert->setUsage(Action::USAGE_RAPIDE);
+        $couvert->setCout(0);
+        $manager->persist($couvert);
 
         $lancerGrenade = new Action();
         $lancerGrenade->setName('Lancer grenade');
@@ -242,6 +267,8 @@ class AppFixtures extends Fixture
         $lancerGrenade->setItem($grenade);
         $lancerGrenade->setDescription('Lance une grenade frag sur une zone ciblée.');
         $lancerGrenade->setUsage(Action::USAGE_ACTION);
+        $lancerGrenade->setCout(1);
+        $manager->persist($lancerGrenade);
 
         $utiliserMedkit = new Action();
         $utiliserMedkit->setName('Utiliser medkit');
@@ -249,6 +276,8 @@ class AppFixtures extends Fixture
         $utiliserMedkit->setItem($medkit);
         $utiliserMedkit->setDescription('Utilise un kit de soin pour récupérer des points de vie.');
         $utiliserMedkit->setUsage(Action::USAGE_RAPIDE);
+        $utiliserMedkit->setCout(1);
+        $manager->persist($utiliserMedkit);
 
         $injecterStim = new Action();
         $injecterStim->setName('Injecter stimpack');
@@ -258,6 +287,25 @@ class AppFixtures extends Fixture
         $injecterStim->setUsage(Action::USAGE_RAPIDE);
         $injecterStim->setMaxUse(1);
         $injecterStim->setUses(1);
+        $injecterStim->setCout(0);
+        $manager->persist($injecterStim);
+
+        // Nouvelles actions liées aux Feats
+        $vampirismeMental = new Action();
+        $vampirismeMental->setName('Vampirisme mental');
+        $vampirismeMental->setType('tech');
+        $vampirismeMental->setDescription('Draine l\'énergie mentale pour réduire le stress.');
+        $vampirismeMental->setUsage(Action::USAGE_RAPIDE);
+        $vampirismeMental->setCout(1);
+        $manager->persist($vampirismeMental);
+
+        $surgeAdrenaline = new Action();
+        $surgeAdrenaline->setName('Surge d\'adrénaline');
+        $surgeAdrenaline->setType('tactique');
+        $surgeAdrenaline->setDescription('Un boost de puissance temporaire.');
+        $surgeAdrenaline->setUsage(Action::USAGE_RAPIDE);
+        $surgeAdrenaline->setCout(0);
+        $manager->persist($surgeAdrenaline);
 
         $characterActionTirPrecis = new CharacterAction();
         $characterActionTirPrecis->setCharacter($edgerunner);
@@ -320,14 +368,6 @@ class AppFixtures extends Fixture
         $manager->persist($characterLockpick);
         $manager->persist($characterStim);
 
-        $manager->persist($tirPrecis);
-        $manager->persist($attaqueLame);
-        $manager->persist($hackRapide);
-        $manager->persist($couvert);
-        $manager->persist($lancerGrenade);
-        $manager->persist($utiliserMedkit);
-        $manager->persist($injecterStim);
-
         $manager->persist($characterActionTirPrecis);
         $manager->persist($characterActionAttaqueLame);
         $manager->persist($characterActionHackRapide);
@@ -335,6 +375,49 @@ class AppFixtures extends Fixture
         $manager->persist($characterActionGrenade);
         $manager->persist($characterActionMedkit);
         $manager->persist($characterActionStim);
+
+        $adrenaline = new Feat();
+        $adrenaline->setName('Adrénaline');
+        $adrenaline->setDescription('Lorsque vous utilisez un stimpack, vous récupérez également 2 points de vie.');
+        $adrenaline->addAction($injecterStim);
+        $adrenaline->addAction($surgeAdrenaline);
+        $adrenaline->setXpcost(15);
+        $manager->persist($adrenaline);
+
+        $empoisonneur = new Feat();
+        $empoisonneur->setName('Empoisonneur');
+        $empoisonneur->setDescription('Vos attaques de l\'âme infligent des dégâts toxiques persistants.');
+        $empoisonneur->addAction($attaqueLame);
+        $empoisonneur->setXpcost(10);
+        $manager->persist($empoisonneur);
+
+        $lanceurCouteaux = new Feat();
+        $lanceurCouteaux->setName('Lanceur de couteaux');
+        $lanceurCouteaux->setDescription('Vous pouvez lancer des couteaux avec une précision mortelle.');
+        $lanceurCouteaux->addAction($attaqueLame);
+        $lanceurCouteaux->setXpcost(8);
+        $manager->persist($lanceurCouteaux);
+
+        $psyVampire = new Feat();
+        $psyVampire->setName('Psy Vampire');
+        $psyVampire->setDescription('Vos hacks réussis drainent l\'énergie mentale de vos cibles pour réduire votre stress.');
+        $psyVampire->addAction($hackRapide);
+        $psyVampire->addAction($vampirismeMental);
+        $psyVampire->setXpcost(12);
+        $manager->persist($psyVampire);
+
+        $mecanicien = new Feat();
+        $mecanicien->setName('Mécanicien');
+        $mecanicien->setDescription('Vous réparez les objets et drones deux fois plus vite.');
+        $mecanicien->setXpcost(10);
+        $manager->persist($mecanicien);
+
+        $characterFeatAdrenaline = new CharacterFeat();
+        $characterFeatAdrenaline->setCharacter($edgerunner);
+        $characterFeatAdrenaline->setFeat($adrenaline);
+        $manager->persist($characterFeatAdrenaline);
+
+        $edgerunner->addFeat($characterFeatAdrenaline);
 
         $manager->flush();
     }

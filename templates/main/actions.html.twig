@@ -68,6 +68,13 @@
                                                                 {{ action.uses|default(0) }}/{{ action.maxUse }}
                                                             </span>
                                                         {% endif %}
+                                                        {% if action.cout > 0 %}
+                                                            <div class="flex items-center gap-1.5 ml-1">
+                                                                {% for i in 1..action.cout %}
+                                                                    <i class="fas fa-dice-six text-sm text-accent"></i>
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
 

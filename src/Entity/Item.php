@@ -14,10 +14,13 @@ class Item
     public const TYPE_EQUIPEMENT = 'equipement';
     public const TYPE_DIVERS = 'divers';
 
+    public const TYPE_CYBERWARE = 'cyberware';
+
     public const TYPES = [
         self::TYPE_CONSOMMABLE => 'Consommable',
         self::TYPE_EQUIPEMENT => 'Équipement',
         self::TYPE_DIVERS => 'Divers',
+        self::TYPE_CYBERWARE => 'Cyberware',
     ];
 
     #[ORM\Id]
@@ -64,10 +67,70 @@ class Item
     #[ORM\Column]
     private ?bool $isCumbersome = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $stock = null;
+
+    #[ORM\Column(options: ["default" => false])]
+    private ?bool $isInfiniteStock = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $humanityLoss = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $installed = null;
+
     public function __construct()
     {
         $this->characterItems = new ArrayCollection();
         $this->actions = new ArrayCollection();
+    }
+
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(?int $stock): static
+    {
+        $this->stock = $stock;
+
+        return $this;
+    }
+
+    public function isInfiniteStock(): ?bool
+    {
+        return $this->isInfiniteStock;
+    }
+
+    public function setIsInfiniteStock(bool $isInfiniteStock): static
+    {
+        $this->isInfiniteStock = $isInfiniteStock;
+
+        return $this;
+    }
+
+    public function getHumanityLoss(): ?int
+    {
+        return $this->humanityLoss;
+    }
+
+    public function setHumanityLoss(?int $humanityLoss): static
+    {
+        $this->humanityLoss = $humanityLoss;
+
+        return $this;
+    }
+
+    public function isInstalled(): ?bool
+    {
+        return $this->installed;
+    }
+
+    public function setInstalled(?bool $installed): static
+    {
+        $this->installed = $installed;
+
+        return $this;
     }
 
     public function getId(): ?int

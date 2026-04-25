@@ -15,6 +15,11 @@ final class MainController extends AbstractController
     {
         if ($this->isGranted('ROLE_USER')) {
             $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
+            
+            if (!$character) {
+                return $this->redirectToRoute('app_character_new');
+            }
+
             return $this->render('main/index.html.twig', [
                 'character' => $character,
             ]);

@@ -32,8 +32,103 @@
         .btn-toggle:hover { background: rgba(255,255,255,0.1); }
     </style>
 
-    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
         <div style="flex: 1; min-width: 300px;">
+            {# Section Level Up #}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0" style="margin:0; color: white; font-weight: bold; letter-spacing: 1px;">GESTION DU JEU</h5>
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
+                        <div>
+                            <h6 class="mb-1">Mode Level Up</h6>
+                            <p class="text-muted small mb-0">Active le bandeau Level Up et les options de progression pour les joueurs.</p>
+                        </div>
+                        <a href="{{ path('admin_levelup_toggle') }}" class="btn {{ levelUpActive ? 'btn-danger' : 'btn-success' }}">
+                            {{ levelUpActive ? 'Désactiver le Level Up' : 'Activer le Level Up' }}
+                        </a>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <h6 class="mb-1">Distribuer de l'Expérience</h6>
+                        <p class="text-muted small mb-3">Ajoute le montant d'XP indiqué au personnage sélectionné ou à tout le groupe.</p>
+                        
+                        <form action="{{ path('admin_xp_give') }}" method="POST" style="display: flex; gap: 10px; align-items: flex-end;">
+                            <div style="flex: 1;">
+                                <label class="small text-muted">Nombre XP</label>
+                                <input type="number" name="amount" value="10" min="1" class="form-control" required>
+                            </div>
+                            <div style="flex: 2;">
+                                <label class="small text-muted">Personnage</label>
+                                <select name="character_id" class="form-control" required>
+                                    <option value="all">Tous les personnages</option>
+                                    {% for character in characters %}
+                                        <option value="{{ character.id }}">{{ character.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-plus mr-1"></i> Donner XP
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {# Section Shop / Stock #}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0" style="margin:0; color: white; font-weight: bold; letter-spacing: 1px;">SHOP & STOCKS</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div style="overflow-x: auto;">
+                        <table class="table table-hover mb-0">
+                            <thead style="background-color: #f8f9fa;">
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Prix</th>
+                                    <th>Stock</th>
+                                    <th style="width: 100px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ item.name }}</strong><br>
+                                            <span class="text-muted small">{{ item.type }}</span>
+                                        </td>
+                                        <td>{{ item.price }} <span class="small">DRG</span></td>
+                                        <td>
+                                            {% if item.infiniteStock %}
+                                                <span class="badge badge-info">∞ Infini</span>
+                                            {% else %}
+                                                <span class="badge {{ (item.stock|default(0)) <= 0 ? 'badge-danger' : 'badge-secondary' }}">
+                                                    {{ item.stock|default(0) }} en stock
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; gap: 5px;">
+                                                <a href="{{ ea_url().setController('App\\Controller\\Admin\\ItemCrudController').setAction('edit').setEntityId(item.id) }}" class="btn btn-sm btn-outline-primary" title="Modifier">
+                                                    <i class="fa fa-pencil"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ItemCrudController').setAction('new') }}" class="btn btn-sm btn-success">
+                        <i class="fa fa-plus mr-1"></i> Ajouter un item
+                    </a>
+                </div>
+            </div>
+
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-dark text-white" style="display: flex; justify-content: space-between; align-items: center;">
                     <h5 class="mb-0" style="margin:0; color: white; font-weight: bold; letter-spacing: 1px;">LOGS D'ACTIVITÉ EN DIRECT</h5>

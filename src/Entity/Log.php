@@ -3,18 +3,19 @@
 namespace App\Entity;
 
 use App\Repository\LogRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LogRepository::class)]
 class Log
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: "character_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
     private ?Edgerunner $character = null;
 
     #[ORM\Column(nullable: true)]
@@ -23,10 +24,10 @@ class Log
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["comment" => ""])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(options: ["default" => null])]
     private ?bool $isCritical = false;
 
     public function __construct()

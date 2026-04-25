@@ -43,6 +43,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $themeColor = null;
 
+    #[ORM\Column(options: ["default" => false])]
+    private ?bool $levelUpActive = false;
+
     public function __construct()
     {
         $this->edgerunners = new ArrayCollection();
@@ -174,6 +177,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setThemeColor(?string $themeColor): static
     {
         $this->themeColor = $themeColor;
+
+        return $this;
+    }
+
+    public function isLevelUpActive(): ?bool
+    {
+        return $this->levelUpActive;
+    }
+
+    public function setLevelUpActive(bool $levelUpActive): static
+    {
+        $this->levelUpActive = $levelUpActive;
 
         return $this;
     }

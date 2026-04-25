@@ -65,7 +65,7 @@ final class CharacterController extends AbstractController
         $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
         if (!$character)
         {
-            return $this->redirectToRoute("app_main");
+            return $this->redirectToRoute("app_character_new");
         }
         if ($stat == "life")
         {
@@ -111,16 +111,24 @@ final class CharacterController extends AbstractController
         {
             $desc = "";
             if ($math == "add"){
-                if ($character->getStresspoints() < $character->getIntelligence() * 5)
-                {
-                    $character->setStresspoints($character->getStresspoints() + $value);
-                    $desc = "Gain de " . $value . " Stress";
+                $gain = 1 + ($character->getHumanityLoss() / 100);
+                $newStress = $character->getStresspoints() + $gain;
+
+                if ($newStress >= 20) {
+                    $character->setStresspoints(0);
+                    $character->setHumanityLoss($character->getHumanityLoss() + 5);
+                    $desc = "CRISE DE NERFS ! Stress réinitialisé, +5 Perte d'humanité";
+                    $this->createLog($manager, $hub, $character, $desc, null, true);
+                    $desc = ""; // On vide desc pour ne pas logger deux fois
+                } else {
+                    $character->setStresspoints($newStress);
+                    $desc = "Gain de " . number_format($gain, 2) . " Stress";
                 }
             } else {
                 if ($character->getStresspoints() > 0)
                 {
-                    $character->setStresspoints($character->getStresspoints() - $value);
-                    $desc = "Perte de " . $value . " Stress";
+                    $character->setStresspoints(max(0, $character->getStresspoints() - 1));
+                    $desc = "Soin de 1 Stress";
                 }
             }
             if ($desc !== "") {
@@ -147,15 +155,21 @@ final class CharacterController extends AbstractController
     }
 
     #[Route('/character/skills', name: 'app_character_skills')]
-    public function characterSkills(ManagerRegistry $manager,)
+    public function characterSkills(ManagerRegistry $manager)
     {
         $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
-        if (!$character)
-        {
-            return $this->redirectToRoute("app_main");
+        if (!$character) {
+            return $this->redirectToRoute("app_character_new");
         }
+
+        $allSkills = $manager->getRepository(\App\Entity\Skill::class)->findAll();
+        $allFeats = $manager->getRepository(\App\Entity\Feat::class)->findAll();
+
         return $this->render('main/skills.html.twig', [
             "character" => $character,
+            "allSkills" => $allSkills,
+            "allFeats" => $allFeats,
+            "mercure_public_url" => $_ENV['MERCURE_PUBLIC_URL'] ?? 'https://example.com/.well-known/mercure',
         ]);
     }
     #[Route('/character/items', name: 'app_character_items')]
@@ -164,7 +178,7 @@ final class CharacterController extends AbstractController
         $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
         if (!$character)
         {
-            return $this->redirectToRoute("app_main");
+            return $this->redirectToRoute("app_character_new");
         }
         return $this->render('main/items.html.twig', [
             "character" => $character,
@@ -177,7 +191,7 @@ final class CharacterController extends AbstractController
         $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
         if (!$character)
         {
-            return $this->redirectToRoute("app_main");
+            return $this->redirectToRoute("app_character_new");
         }
         $actionsArray = [];
         $itemAmounts = [];
@@ -247,6 +261,30 @@ final class CharacterController extends AbstractController
                 }
             }
         }
+
+        // Actions from Feats (only if acquired: xptot >= xpcost)
+        foreach ($character->getFeats() as $characterFeat) {
+            $feat = $characterFeat->getFeat();
+            if ($characterFeat->getXptot() >= ($feat->getXpcost() ?? 0)) {
+                foreach ($feat->getActions() as $action) {
+                    $type = $action->getType();
+                    $actionId = $action->getId();
+
+                    if (!isset($actionsArray[$type])) {
+                        $actionsArray[$type] = [];
+                    }
+
+                    // Avoid duplicates if the action is already granted elsewhere
+                    if (!isset($actionsArray[$type][$actionId])) {
+                        $actionsArray[$type][$actionId] = [
+                            'object' => $action,
+                            'amount' => null,
+                            'characterItemId' => null
+                        ];
+                    }
+                }
+            }
+        }
         return $this->render('main/actions.html.twig', [
             "character" => $character,
             "actions" => $actionsArray,
@@ -289,7 +327,7 @@ final class CharacterController extends AbstractController
     {
         $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
         if (!$character) {
-            return $this->redirectToRoute("app_main");
+            return $this->redirectToRoute("app_character_new");
         }
 
         $entityManager = $manager->getManager();

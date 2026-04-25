@@ -12,6 +12,10 @@
                     <p class="text-xs uppercase tracking-[0.28em] text-muted text-neon">Edgerunner interface</p>
                     <h1 class="text-2xl font-bold text-app">{{ character.nom }}</h1>
                 </div>
+                <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-[0.2em] text-accent/80 font-bold">XP</div>
+                    <div class="text-lg font-bold text-accent text-neon">{{ character.xp|default(0) }}</div>
+                </div>
             </div>
         </header>
 
@@ -60,18 +64,16 @@
                                     </h3>
                                 </div>
 
-                                {% for characterSkill in character.skills %}
+                                {% for characterSkill in character.skills|sort((a, b) => a.skill.name <=> b.skill.name) %}
                                     {% if characterSkill.skill.mainStat == statName %}
-                                        {% set xpPercent = characterSkill.xp %}
-                                        {% if xpPercent > 100 %}
-                                            {% set xpPercent = 100 %}
-                                        {% endif %}
-
                                         <div class="rounded-2xl border border-app bg-panel p-4">
                                             <div class="flex items-start justify-between gap-3">
                                                 <div>
                                                     <div class="text-sm font-semibold uppercase tracking-[0.18em] text-app">
                                                         {{ characterSkill.skill.name }}
+                                                    </div>
+                                                    <div class="mt-1 text-[10px] font-mono text-muted">
+                                                        XP Investissement : {{ characterSkill.xptot|default(0) }} / {{ characterSkill.skill.xpcost|default('?') }}
                                                     </div>
                                                 </div>
 
@@ -84,6 +86,18 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {% if app.user.levelUpActive and characterSkill.level < 5 %}
+                                                <div class="mt-4 flex items-center justify-between p-2 rounded-lg bg-accent/10 border border-accent/30 shadow-neon-soft animate-pulse">
+                                                    <div class="flex flex-col">
+                                                        <span class="text-[10px] uppercase font-bold text-accent">Points d'investissement</span>
+                                                        <span class="text-xs font-mono text-app">{{ characterSkill.xptot|default(0) }} / {{ characterSkill.skill.xpcost|default('?') }}</span>
+                                                    </div>
+                                                    <a href="{{ path('app_levelup_addxp', {type: 'skill', id: characterSkill.id}) }}" class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-white shadow-neon active:scale-90 transition-transform">
+                                                        <i class="fas fa-plus"></i>
+                                                    </a>
+                                                </div>
+                                            {% endif %}
 
                                             {# Niveau en 5 cases horizontales #}
                                             <div class="mt-4 flex gap-2">
@@ -98,35 +112,167 @@
                                                     ></div>
                                                 {% endfor %}
                                             </div>
-
-                                            {# Barre XP fine #}
-                                            <div class="mt-3 space-y-1">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="text-[11px] uppercase tracking-[0.16em] text-muted">XP</span>
-                                                    <span class="text-[11px] text-muted">{{ characterSkill.xp }}/100</span>
-                                                </div>
-
-                                                <div class="h-1.5 w-full overflow-hidden rounded-full border border-app bg-panel-2">
-                                                    <div
-                                                        class="h-full transition-all duration-300"
-                                                        style="
-                                                            width: {{ xpPercent }}%;
-                                                            background: var(--bar-stress);
-                                                            box-shadow: 0 0 6px var(--bar-life-glow);
-                                                            "
-                                                    ></div>
-                                                </div>
-                                            </div>
                                         </div>
                                     {% endif %}
                                 {% endfor %}
                             </div>
                         {% endif %}
                     {% endfor %}
+
+                    {# SECTION FEATS #}
+                    {% if character.feats|length > 0 %}
+                        <div class="space-y-3 pt-2">
+                            <div class="border-b border-app pb-2">
+                                <h2 class="text-sm font-semibold uppercase tracking-[0.24em] text-muted">
+                                    Feats
+                                </h2>
+                            </div>
+
+                                {% for characterFeat in character.feats|sort((a, b) => a.feat.name <=> b.feat.name) %}
+                                    {% set feat = characterFeat.feat %}
+                                    {% set isAcquired = characterFeat.xptot >= (feat.xpcost|default(0)) %}
+                                    <div class="rounded-2xl border bg-panel p-4 shadow-neon-soft transition-all {{ isAcquired ? 'border-accent/30' : 'border-app opacity-70' }} relative overflow-hidden">
+                                        <div class="flex items-start justify-between gap-3 {{ not isAcquired ? 'grayscale' }}">
+                                            <div class="min-w-0">
+                                                <div class="text-sm font-bold uppercase tracking-[0.16em] {{ isAcquired ? 'text-accent text-neon' : 'text-muted' }}">
+                                                    {{ feat.name }}
+                                                </div>
+                                                
+                                                {% if feat.actions|length > 0 %}
+                                                    <div class="mt-1 flex flex-wrap gap-1">
+                                                        {% for action in feat.actions %}
+                                                            <span class="text-[9px] font-bold uppercase tracking-wider text-muted border border-app/30 px-1.5 py-0.5 rounded bg-app/5">
+                                                                {{ action.name }}
+                                                            </span>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+
+                                                {% if not isAcquired %}
+                                                    <div class="mt-2 text-[10px] font-mono text-muted">
+                                                        Progression : {{ characterFeat.xptot|default(0) }} / {{ feat.xpcost|default('?') }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        {% if app.user.levelUpActive and not isAcquired %}
+                                            <div class="mt-4 flex items-center justify-between p-2 rounded-lg bg-accent/20 border border-accent shadow-neon animate-pulse">
+                                                <div class="flex flex-col">
+                                                    <span class="text-[10px] uppercase font-black text-accent">Investir XP</span>
+                                                    <span class="text-xs font-mono text-app">{{ characterFeat.xptot|default(0) }} / {{ feat.xpcost|default('?') }}</span>
+                                                </div>
+                                                <a href="{{ path('app_levelup_addxp', {type: 'feat', id: characterFeat.id}) }}" class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-white shadow-neon active:scale-90 transition-transform">
+                                                    <i class="fas fa-plus text-lg"></i>
+                                                </a>
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="mt-3 text-xs leading-relaxed text-muted italic {{ not isAcquired ? 'grayscale' }}">
+                                            "{{ feat.description }}"
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {# LISTE DES COMPETENCES DISPONIBLES (EN MODE LEVEL UP) #}
+                    {% if app.user.levelUpActive %}
+                        <div class="pt-6 border-t border-accent/30">
+                            <details class="group">
+                                <summary class="flex cursor-pointer list-none items-center justify-center gap-3 rounded-xl border border-accent bg-accent/5 py-3 text-accent transition-all hover:bg-accent/10 active:scale-95">
+                                    <i class="fas fa-plus group-open:rotate-45 transition-transform"></i>
+                                    <span class="text-xs font-bold uppercase tracking-widest">Nouveau</span>
+                                </summary>
+
+                                <div class="mt-6 space-y-6">
+                                    <div class="space-y-4">
+                                        <h2 class="text-sm font-bold uppercase tracking-[0.24em] text-accent text-neon text-center">
+                                            <i class="fas fa-bolt mr-2"></i>Compétences Disponibles<i class="fas fa-bolt ml-2"></i>
+                                        </h2>
+
+                                        {# Filtre les skills déjà possédés #}
+                                        {% set ownedSkillIds = [] %}
+                                        {% for cs in character.skills %}
+                                            {% set ownedSkillIds = ownedSkillIds|merge([cs.skill.id]) %}
+                                        {% endfor %}
+
+                                        <div class="space-y-3">
+                                            {% for skill in allSkills %}
+                                                {% if skill.id not in ownedSkillIds %}
+                                                    <div class="rounded-2xl border border-app bg-panel/50 p-4 flex items-center justify-between gap-3">
+                                                        <div>
+                                                            <div class="text-sm font-semibold uppercase tracking-[0.18em] text-app">
+                                                                {{ skill.name }}
+                                                            </div>
+                                                            <div class="text-[10px] uppercase text-muted">
+                                                                {{ skill.mainStat }} | Coût : {{ skill.xpcost|default('?') }} XP
+                                                            </div>
+                                                        </div>
+                                                        <a href="{{ path('app_levelup_interest', {type: 'skill', id: skill.id}) }}" class="px-3 py-1.5 rounded-lg border border-accent bg-accent/10 text-[10px] font-bold uppercase text-accent hover:bg-accent hover:text-white transition-all">
+                                                            S'intéresser
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <h2 class="text-sm font-bold uppercase tracking-[0.24em] text-accent text-neon text-center pt-4">
+                                            <i class="fas fa-bolt mr-2"></i>Feats Disponibles<i class="fas fa-bolt ml-2"></i>
+                                        </h2>
+
+                                        {# Filtre les feats déjà possédés #}
+                                        {% set ownedFeatIds = [] %}
+                                        {% for cf in character.feats %}
+                                            {% set ownedFeatIds = ownedFeatIds|merge([cf.feat.id]) %}
+                                        {% endfor %}
+
+                                        <div class="space-y-3">
+                                            {% for feat in allFeats %}
+                                                {% if feat.id not in ownedFeatIds %}
+                                                    <div class="rounded-2xl border border-app bg-panel/50 p-4">
+                                                        <div class="flex items-start justify-between gap-3">
+                                                            <div>
+                                                                <div class="text-sm font-semibold uppercase tracking-[0.18em] text-app">
+                                                                    {{ feat.name }}
+                                                                </div>
+                                                                <div class="text-[10px] uppercase text-muted">
+                                                                    Coût : {{ feat.xpcost|default('?') }} XP
+                                                                </div>
+                                                            </div>
+                                                            <a href="{{ path('app_levelup_interest', {type: 'feat', id: feat.id}) }}" class="px-3 py-1.5 rounded-lg border border-accent bg-accent/10 text-[10px] font-bold uppercase text-accent hover:bg-accent hover:text-white transition-all">
+                                                                S'intéresser
+                                                            </a>
+                                                        </div>
+                                                        <div class="mt-2 text-[10px] text-muted italic">
+                                                            {{ feat.description|length > 80 ? feat.description|slice(0, 80) ~ '...' : feat.description }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    {% endif %}
                 </div>
             </section>
 
             {% include "main/_nav.html.twig" %}
         </div>
     </div>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const eventSource = new EventSource("{{ (mercure_public_url|default('https://example.com/.well-known/mercure')) ~ '?topic=' ~ ('https://archadia.net/levelup'|url_encode) }}");
+            
+            eventSource.onmessage = event => {
+                // On recharge la page pour mettre à jour les boutons d'XP et la liste des compétences disponibles
+                window.location.reload();
+            };
+        });
+    </script>
 {% endblock %}

@@ -55,6 +55,9 @@ class Action
     #[ORM\Column(nullable: true)]
     private ?int $uses = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $cout = null;
+
     public function __construct()
     {
         $this->characterActions = new ArrayCollection();
@@ -150,6 +153,18 @@ class Action
     public function setUses(?int $uses): static
     {
         $this->uses = $uses;
+
+        return $this;
+    }
+
+    public function getCout(): ?int
+    {
+        return $this->cout;
+    }
+
+    public function setCout(?int $cout): static
+    {
+        $this->cout = $cout;
 
         return $this;
     }

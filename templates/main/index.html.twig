@@ -47,6 +47,9 @@
 
                     {# SECTION ARGENT #}
                     <div class="rounded-2xl border border-app bg-panel-2 p-4 text-center">
+                        <div class="mb-1 text-[10px] uppercase tracking-[0.2em] text-accent/60">
+                            XP: {{ character.xp|default(0) }}
+                        </div>
                         <div class="text-[10px] uppercase tracking-[0.24em] text-muted">Dragons</div>
                         <div class="mt-2 flex items-center justify-center gap-2 text-2xl font-bold text-accent text-neon">
                             {{ character.money|number_format(0, '.', ' ') }}
@@ -124,7 +127,7 @@
                                         "
                                 ></div>
                                 {# SEGMENT CYBER #}
-                                {% if currentCyber > 0 %}
+                                {% if character.cyberpoints > 0 and currentCyber > 0 %}
                                     <div
                                         class="h-full transition-all duration-300"
                                         style="
@@ -156,26 +159,32 @@
                                 </div>
 
                                 {# Label central optionnel #}
-                                <span class="text-[10px] uppercase tracking-[0.2em] text-muted">Life / Cyber</span>
+                                <span class="text-[10px] uppercase tracking-[0.2em] text-muted">
+                                    {% if character.cyberpoints > 0 %}Life / Cyber{% else %}Life{% endif %}
+                                </span>
 
                                 {# Boutons CYBER à droite #}
-                                <div class="flex gap-2">
-                                    <a
-                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'cyber', math: 'sub', value: 1}) }}"
-                                        style="background: linear-gradient(90deg,#6f7d8c,#9fb3c8)"
-                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
-                                    >
-                                        −
-                                    </a>
+                                {% if character.cyberpoints > 0 %}
+                                    <div class="flex gap-2">
+                                        <a
+                                            href="{{ path('app_maj_stat', {id: character.id, stat: 'cyber', math: 'sub', value: 1}) }}"
+                                            style="background: linear-gradient(90deg,#6f7d8c,#9fb3c8)"
+                                            class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                        >
+                                            −
+                                        </a>
 
-                                    <a
-                                        href="{{ path('app_maj_stat', {id: character.id, stat: 'cyber', math: 'add', value: 1}) }}"
-                                        style="background: linear-gradient(90deg,#6f7d8c,#9fb3c8)"
-                                        class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
-                                    >
-                                        +
-                                    </a>
-                                </div>
+                                        <a
+                                            href="{{ path('app_maj_stat', {id: character.id, stat: 'cyber', math: 'add', value: 1}) }}"
+                                            style="background: linear-gradient(90deg,#6f7d8c,#9fb3c8)"
+                                            class="flex h-8 w-8 items-center justify-center rounded-full border border-app text-sm font-bold text-app shadow-neon-soft hover:bg-panel-2"
+                                        >
+                                            +
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <div class="w-[72px]"></div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -184,7 +193,6 @@
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-semibold text-app">STRESS</span>
                                 <span class="text-sm text-muted">
-                                    {{ character.stresspoints }}
                                 </span>
                             </div>
                             <div class="h-2 w-full overflow-hidden rounded-full border border-app bg-panel">

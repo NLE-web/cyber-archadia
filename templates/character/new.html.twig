@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau personnage{% endblock %}
+
+{% block body %}
+    <div class="app-shell max-w-md mx-auto pb-28">
+        <header class="app-header mb-6 text-center">
+            <p class="text-xs uppercase tracking-[0.28em] text-muted text-neon">Initialisation du profil</p>
+            <h1 class="text-3xl font-bold text-app">Nouvel Edgerunner</h1>
+        </header>
+
+        <section class="card card--neon scanlines">
+            {{ form_start(form) }}
+                <div class="space-y-6">
+                    {# Section Identité #}
+                    <div class="space-y-4">
+                        <div class="border-b border-app pb-2">
+                            <h3 class="text-xs font-semibold uppercase tracking-[0.24em] text-muted">Identité</h3>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            {{ form_label(form.nom, null, {'label_attr': {'class': 'text-xs uppercase tracking-wider text-muted'}}) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'w-full rounded-lg border border-app bg-panel px-4 py-3 text-app focus:border-accent focus:outline-none shadow-neon-soft'}}) }}
+                            {{ form_errors(form.nom) }}
+                        </div>
+
+                        <div class="space-y-2">
+                            {{ form_label(form.avatarFile, null, {'label_attr': {'class': 'text-xs uppercase tracking-wider text-muted'}}) }}
+                            {{ form_widget(form.avatarFile, {'attr': {'class': 'w-full rounded-lg border border-app bg-panel px-4 py-3 text-app focus:border-accent focus:outline-none shadow-neon-soft'}}) }}
+                            {{ form_errors(form.avatarFile) }}
+                        </div>
+
+                        <div class="space-y-2">
+                            {{ form_label(form.themeColor, null, {'label_attr': {'class': 'text-xs uppercase tracking-wider text-muted'}}) }}
+                            {{ form_widget(form.themeColor, {'attr': {'class': 'w-full rounded-lg border border-app bg-panel px-4 py-3 text-app focus:border-accent focus:outline-none shadow-neon-soft'}}) }}
+                            {{ form_errors(form.themeColor) }}
+                        </div>
+                    </div>
+
+                    {# Section Caractéristiques #}
+                    <div class="space-y-4">
+                        <div class="border-b border-app pb-2">
+                            <h3 class="text-xs font-semibold uppercase tracking-[0.24em] text-muted">Caractéristiques (6 points à répartir)</h3>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="space-y-2 text-center">
+                                {{ form_label(form.force, null, {'label_attr': {'class': 'text-[10px] uppercase tracking-wider text-muted'}}) }}
+                                {{ form_widget(form.force, {'attr': {'class': 'w-full rounded-lg border border-app bg-panel px-2 py-3 text-center text-xl font-bold text-accent shadow-neon-soft focus:border-accent focus:outline-none', 'min': 0, 'max': 3}}) }}
+                            </div>
+                            <div class="space-y-2 text-center">
+                                {{ form_label(form.dexterite, null, {'label_attr': {'class': 'text-[10px] uppercase tracking-wider text-muted'}}) }}
+                                {{ form_widget(form.dexterite, {'attr': {'class': 'w-full rounded-lg border border-app bg-panel px-2 py-3 text-center text-xl font-bold text-accent shadow-neon-soft focus:border-accent focus:outline-none', 'min': 0, 'max': 3}}) }}
+                            </div>
+                            <div class="space-y-2 text-center">
+                                {{ form_label(form.intelligence, null, {'label_attr': {'class': 'text-[10px] uppercase tracking-wider text-muted'}}) }}
+                                {{ form_widget(form.intelligence, {'attr': {'class': 'w-full rounded-lg border border-app bg-panel px-2 py-3 text-center text-xl font-bold text-accent shadow-neon-soft focus:border-accent focus:outline-none', 'min': 0, 'max': 3}}) }}
+                            </div>
+                        </div>
+                        {{ form_errors(form) }}
+                    </div>
+
+                    <button type="submit" class="mt-1 w-full rounded-xl border border-accent bg-accent/10 py-4 text-sm font-bold uppercase tracking-widest text-accent shadow-neon transition-all hover:bg-accent/20 active:scale-[0.98]">
+                        Générer le personnage
+                    </button>
+                </div>
+            {{ form_end(form) }}
+        </section>
+    </div>
+
+    <style>
+        /* Custom styles for form errors if needed */
+        .invalid-feedback, ul li {
+            color: rgb(var(--danger));
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            list-style: none;
+        }
+    </style>
+{% endblock %}

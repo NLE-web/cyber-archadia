@@ -2,27 +2,24 @@
 
 namespace App\Entity;
 
-use App\Repository\CharacterSkillRepository;
+use App\Repository\CharacterFeatRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CharacterSkillRepository::class)]
-class CharacterSkill
+#[ORM\Entity(repositoryClass: CharacterFeatRepository::class)]
+class CharacterFeat
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'skills')]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\ManyToOne(inversedBy: 'feats')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Edgerunner $character = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    private ?Skill $skill = null;
-
-    #[ORM\Column]
-    private ?int $level = null;
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Feat $feat = null;
 
     #[ORM\Column(options: ["default" => 0])]
     private ?int $xptot = 0;
@@ -56,32 +53,20 @@ class CharacterSkill
         return $this;
     }
 
-    public function getSkill(): ?Skill
+    public function getFeat(): ?Feat
     {
-        return $this->skill;
+        return $this->feat;
     }
 
-    public function setSkill(?Skill $skill): static
+    public function setFeat(?Feat $feat): static
     {
-        $this->skill = $skill;
-
-        return $this;
-    }
-
-    public function getLevel(): ?int
-    {
-        return $this->level;
-    }
-
-    public function setLevel(int $level): static
-    {
-        $this->level = $level;
+        $this->feat = $feat;
 
         return $this;
     }
 
     public function __toString(): string
     {
-        return $this->skill?->getName() ?? 'Compétence inconnue';
+        return $this->feat?->getName() ?? 'Feat inconnu';
     }
 }

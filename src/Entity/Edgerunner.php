@@ -33,8 +33,8 @@ class Edgerunner
     #[ORM\Column]
     private ?int $cyberpoints = null;
 
-    #[ORM\Column]
-    private ?int $stresspoints = null;
+    #[ORM\Column(type: "float")]
+    private ?float $stresspoints = null;
 
     #[ORM\ManyToOne(inversedBy: 'edgerunners')]
     private ?User $player = null;
@@ -42,7 +42,7 @@ class Edgerunner
     #[ORM\Column(nullable: true)]
     private ?bool $isActive = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist'])]
     private ?ImageFile $avatar = null;
 
     #[ORM\Column(nullable: true)]
@@ -69,15 +69,40 @@ class Edgerunner
     #[ORM\OneToMany(targetEntity: CharacterAction::class, mappedBy: 'character', cascade: ['persist', 'remove'])]
     private Collection $actions;
 
+    /**
+     * @var Collection<int, CharacterFeat>
+     */
+    #[ORM\OneToMany(targetEntity: CharacterFeat::class, mappedBy: 'character', cascade: ['persist', 'remove'])]
+    private Collection $feats;
+
     #[ORM\Column]
     private ?int $money = null;
+
+    #[ORM\Column(options: ["default" => 10])]
+    private ?int $xp = 10;
+
+    #[ORM\Column(options: ["default" => 0])]
+    private ?int $humanityLoss = 0;
 
     public function __construct()
     {
         $this->skills = new ArrayCollection();
         $this->items = new ArrayCollection();
         $this->actions = new ArrayCollection();
+        $this->feats = new ArrayCollection();
     }
+    public function getHumanityLoss(): ?int
+    {
+        return $this->humanityLoss;
+    }
+
+    public function setHumanityLoss(int $humanityLoss): static
+    {
+        $this->humanityLoss = $humanityLoss;
+
+        return $this;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -155,12 +180,12 @@ class Edgerunner
         return $this;
     }
 
-    public function getStresspoints(): ?int
+    public function getStresspoints(): ?float
     {
         return $this->stresspoints;
     }
 
-    public function setStresspoints(int $stresspoints): static
+    public function setStresspoints(float $stresspoints): static
     {
         $this->stresspoints = $stresspoints;
 
@@ -322,6 +347,36 @@ class Edgerunner
         return $this->nom ?? 'Personnage';
     }
 
+    /**
+     * @return Collection<int, CharacterFeat>
+     */
+    public function getFeats(): Collection
+    {
+        return $this->feats;
+    }
+
+    public function addFeat(CharacterFeat $feat): static
+    {
+        if (!$this->feats->contains($feat)) {
+            $this->feats->add($feat);
+            $feat->setCharacter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFeat(CharacterFeat $feat): static
+    {
+        if ($this->feats->removeElement($feat)) {
+            // set the owning side to null (unless already changed)
+            if ($feat->getCharacter() === $this) {
+                $feat->setCharacter(null);
+            }
+        }
+
+        return $this;
+    }
+
     public function getMoney(): ?int
     {
         return $this->money;
@@ -330,6 +385,18 @@ class Edgerunner
     public function setMoney(int $money): static
     {
         $this->money = $money;
+
+        return $this;
+    }
+
+    public function getXp(): ?int
+    {
+        return $this->xp;
+    }
+
+    public function setXp(int $xp): static
+    {
+        $this->xp = $xp;
 
         return $this;
     }

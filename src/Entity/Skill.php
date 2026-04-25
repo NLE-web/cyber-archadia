@@ -27,9 +27,24 @@ class Skill
     #[ORM\OneToMany(targetEntity: CharacterSkill::class, mappedBy: 'skill', cascade: ['remove'])]
     private Collection $characterSkills;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $xpcost = null;
+
     public function __construct()
     {
         $this->characterSkills = new ArrayCollection();
+    }
+
+    public function getXpcost(): ?int
+    {
+        return $this->xpcost;
+    }
+
+    public function setXpcost(?int $xpcost): static
+    {
+        $this->xpcost = $xpcost;
+
+        return $this;
     }
 
     public function getId(): ?int
