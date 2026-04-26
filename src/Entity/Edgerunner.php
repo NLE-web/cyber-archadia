@@ -84,12 +84,19 @@ class Edgerunner
     #[ORM\Column(options: ["default" => 0])]
     private ?int $humanityLoss = 0;
 
+    /**
+     * @var Collection<int, Stuff>
+     */
+    #[ORM\OneToMany(targetEntity: Stuff::class, mappedBy: 'character', cascade: ['persist', 'remove'])]
+    private Collection $stuffs;
+
     public function __construct()
     {
         $this->skills = new ArrayCollection();
         $this->items = new ArrayCollection();
         $this->actions = new ArrayCollection();
         $this->feats = new ArrayCollection();
+        $this->stuffs = new ArrayCollection();
     }
     public function getHumanityLoss(): ?int
     {
@@ -397,6 +404,36 @@ class Edgerunner
     public function setXp(int $xp): static
     {
         $this->xp = $xp;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Stuff>
+     */
+    public function getStuffs(): Collection
+    {
+        return $this->stuffs;
+    }
+
+    public function addStuff(Stuff $stuff): static
+    {
+        if (!$this->stuffs->contains($stuff)) {
+            $this->stuffs->add($stuff);
+            $stuff->setCharacter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStuff(Stuff $stuff): static
+    {
+        if ($this->stuffs->removeElement($stuff)) {
+            // set the owning side to null (unless already changed)
+            if ($stuff->getCharacter() === $this) {
+                $stuff->setCharacter(null);
+            }
+        }
 
         return $this;
     }

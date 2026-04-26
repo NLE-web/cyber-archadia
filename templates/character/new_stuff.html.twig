@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel objet custom{% endblock %}
+
+{% block body %}
+    <div class="app-shell max-w-md mx-auto pb-28">
+        <header class="app-header mb-4">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.28em] text-muted text-neon">
+                        Edgerunner interface
+                    </p>
+                    <h1 class="text-2xl font-bold text-app">
+                        Nouvel Objet
+                    </h1>
+                </div>
+                <a href="{{ path('app_character_items') }}" class="text-muted hover:text-app">
+                    <i class="fas fa-times text-xl"></i>
+                </a>
+            </div>
+        </header>
+
+        <section class="card card--neon scanlines">
+            {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+                <div class="space-y-4">
+                    <div>
+                        {{ form_label(form.title, null, {'label_attr': {'class': 'block text-[10px] font-bold uppercase tracking-[0.2em] text-muted mb-2'}}) }}
+                        {{ form_widget(form.title, {'attr': {'class': 'w-full rounded-xl border border-app bg-panel px-4 py-3 text-app focus:border-accent focus:outline-none focus:shadow-neon-soft'}}) }}
+                    </div>
+                    <div>
+                        {{ form_label(form.description, null, {'label_attr': {'class': 'block text-[10px] font-bold uppercase tracking-[0.2em] text-muted mb-2'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'w-full rounded-xl border border-app bg-panel px-4 py-3 text-app focus:border-accent focus:outline-none focus:shadow-neon-soft'}}) }}
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full rounded-xl bg-accent py-4 text-sm font-bold uppercase tracking-[0.24em] text-black shadow-neon transition-all hover:scale-[1.02] active:scale-95">
+                        Enregistrer
+                    </button>
+                </div>
+            {{ form_end(form) }}
+        </section>
+    </div>
+{% endblock %}

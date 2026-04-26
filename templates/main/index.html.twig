@@ -100,7 +100,7 @@
                     {% set lifePercent = (currentLife / (character.lifepoints+character.cyberpoints) * 100) %}
                     {% set currentCyber = character.cyberpoints - character.lostcyber %}
                     {% set cyberPercent = (currentCyber / (character.lifepoints+character.cyberpoints) * 100) %}
-                    {% set stressPercent = (character.stresspoints / (character.intelligence * 5) * 100) %}
+                    {% set stressPercent = (character.stresspoints / 20 * 100) %}
 
                     <div class="space-y-4">
                         {# ================= LIFE ================= #}
@@ -189,8 +189,34 @@
                         </div>
 
                         {# ================= STRESS ================= #}
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between">
+                        <div class="space-y-1 relative" id="stress-container">
+                            {% set breakdownFlashes = app.flashes('breakdown') %}
+                            {% set hasBreakdown = breakdownFlashes|length > 0 %}
+                            {% for message in breakdownFlashes %}
+                                <div class="absolute -top-6 left-0 right-0 text-center animate-pulse duration-500 z-10" id="breakdown-message">
+                                    <span class="text-xs font-black uppercase tracking-[0.3em] text-danger text-neon-danger">
+                                        Breakdown
+                                    </span>
+                                </div>
+                                <script>
+                                    setTimeout(() => {
+                                        const breakdown = document.getElementById('breakdown-message');
+                                        const stressLabels = document.querySelectorAll('.stress-label');
+                                        if (breakdown) {
+                                            breakdown.style.transition = 'opacity 1s ease';
+                                            breakdown.style.opacity = '0';
+                                            setTimeout(() => {
+                                                breakdown.remove();
+                                                stressLabels.forEach(label => {
+                                                    label.style.transition = 'opacity 1s ease';
+                                                    label.style.opacity = '1';
+                                                });
+                                            }, 1000);
+                                        }
+                                    }, 5000);
+                                </script>
+                            {% endfor %}
+                            <div class="flex items-center justify-between stress-label transition-opacity duration-500 {{ hasBreakdown ? 'opacity-0' : '' }}">
                                 <span class="text-sm font-semibold text-app">STRESS</span>
                                 <span class="text-sm text-muted">
                                 </span>
@@ -225,7 +251,7 @@
                                     </a>
                                 </div>
 
-                                <span class="text-[10px] uppercase tracking-[0.2em] text-muted">Stress</span>
+                                <span class="text-[10px] uppercase tracking-[0.2em] text-muted stress-label transition-opacity duration-500 {{ hasBreakdown ? 'opacity-0' : '' }}">Stress</span>
 
                                 <div class="w-[72px]"></div>
                             </div>

@@ -23,7 +23,7 @@ class ItemCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             TextField::new('name', 'Nom'),
-            ChoiceField::new('type', 'Type')->setChoices(Item::TYPES),
+            ChoiceField::new('type', 'Type')->setChoices(array_flip(Item::TYPES)),
             BooleanField::new('isLegal', 'Légal'),
             BooleanField::new('isCumbersome', 'Encombrant'),
             AssociationField::new('illustration', 'Illustration'),
@@ -34,7 +34,6 @@ class ItemCrudController extends AbstractCrudController
             IntegerField::new('stock', 'Stock'),
             BooleanField::new('isInfiniteStock', 'Stock infini'),
             IntegerField::new('humanityLoss', 'Perte d\'Humanité'),
-            BooleanField::new('installed', 'Installé (Cyberware)'),
             AssociationField::new('actions', 'Actions liées'),
         ];
     }

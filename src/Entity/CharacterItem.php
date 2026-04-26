@@ -24,6 +24,12 @@ class CharacterItem
     #[ORM\Column(nullable: true)]
     private ?int $amount = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isInstalled = false;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isEquipped = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,6 +67,30 @@ class CharacterItem
     public function setAmount(?int $amount): static
     {
         $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function isInstalled(): bool
+    {
+        return $this->isInstalled;
+    }
+
+    public function setIsInstalled(bool $isInstalled): static
+    {
+        $this->isInstalled = $isInstalled;
+
+        return $this;
+    }
+
+    public function isEquipped(): bool
+    {
+        return $this->isEquipped;
+    }
+
+    public function setIsEquipped(bool $isEquipped): static
+    {
+        $this->isEquipped = $isEquipped;
 
         return $this;
     }

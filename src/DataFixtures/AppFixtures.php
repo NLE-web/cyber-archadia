@@ -64,9 +64,84 @@ class AppFixtures extends Fixture
         $edgerunner->setIsActive(true);
         $edgerunner->setPlayer($user);
         $edgerunner->setAvatar($avatar);
-        $edgerunner->setMoney(5000);
-        $edgerunner->setXp(20);
-        $edgerunner->setHumanityLoss(0);
+        $edgerunner->setMoney(15000);
+        $edgerunner->setXp(50);
+        $edgerunner->setHumanityLoss(14);
+
+        $eyes = new Item();
+        $eyes->setName('Yeux Kiroshi Mk.3');
+        $eyes->setType(Item::TYPE_CYBERWARE);
+        $eyes->setIllustration($itemIllustration);
+        $eyes->setIsConsume(false);
+        $eyes->setPrice(2500);
+        $eyes->setChargePrice(0);
+        $eyes->setDescription('Optiques haut de gamme avec zoom et analyseur tactique.');
+        $eyes->setIsLegal(true);
+        $eyes->setIsCumbersome(false);
+        $eyes->setHumanityLoss(4);
+        $manager->persist($eyes);
+
+        $arms = new Item();
+        $arms->setName('Bras Gorilla');
+        $arms->setType(Item::TYPE_CYBERWARE);
+        $arms->setIllustration($itemIllustration);
+        $arms->setIsConsume(false);
+        $arms->setPrice(4500);
+        $arms->setChargePrice(0);
+        $arms->setDescription('Force brute augmentée pour le combat au corps à corps.');
+        $arms->setIsLegal(false);
+        $arms->setIsCumbersome(false);
+        $arms->setHumanityLoss(6);
+        $manager->persist($arms);
+
+        $legs = new Item();
+        $legs->setName('Tendons renforcés');
+        $legs->setType(Item::TYPE_CYBERWARE);
+        $legs->setIllustration($itemIllustration);
+        $legs->setIsConsume(false);
+        $legs->setPrice(3000);
+        $legs->setChargePrice(0);
+        $legs->setDescription('Permet des sauts bien plus hauts et amortit les chutes.');
+        $legs->setIsLegal(true);
+        $legs->setIsCumbersome(false);
+        $legs->setHumanityLoss(4);
+        $manager->persist($legs);
+
+        $cyberdeck = new Item();
+        $cyberdeck->setName('Cyberdeck Tetratronic Rippler');
+        $cyberdeck->setType(Item::TYPE_EQUIPEMENT);
+        $cyberdeck->setIllustration($itemIllustration);
+        $cyberdeck->setIsConsume(false);
+        $cyberdeck->setPrice(7500);
+        $cyberdeck->setChargePrice(0);
+        $cyberdeck->setDescription('Le nec plus ultra pour le piratage rapide.');
+        $cyberdeck->setIsLegal(false);
+        $cyberdeck->setIsCumbersome(false);
+        $manager->persist($cyberdeck);
+
+        $characterEyes = new CharacterItem();
+        $characterEyes->setCharacter($edgerunner);
+        $characterEyes->setItem($eyes);
+        $characterEyes->setIsInstalled(true);
+        $manager->persist($characterEyes);
+
+        $characterArms = new CharacterItem();
+        $characterArms->setCharacter($edgerunner);
+        $characterArms->setItem($arms);
+        $characterArms->setIsInstalled(true);
+        $manager->persist($characterArms);
+
+        $characterLegs = new CharacterItem();
+        $characterLegs->setCharacter($edgerunner);
+        $characterLegs->setItem($legs);
+        $characterLegs->setIsInstalled(true);
+        $manager->persist($characterLegs);
+
+        $characterCyberdeck = new CharacterItem();
+        $characterCyberdeck->setCharacter($edgerunner);
+        $characterCyberdeck->setItem($cyberdeck);
+        $characterCyberdeck->setIsEquipped(true);
+        $manager->persist($characterCyberdeck);
 
         $hacking = new Skill();
         $hacking->setName('hacking');
@@ -213,12 +288,27 @@ class AppFixtures extends Fixture
         $characterKatana->setCharacter($edgerunner);
         $characterKatana->setItem($katana);
         $characterKatana->setAmount(1);
+        $characterKatana->setIsEquipped(true);
+        $manager->persist($characterKatana);
+
+        $characterVest = new CharacterItem();
+        $characterVest->setCharacter($edgerunner);
+        $characterVest->setItem($vest);
+        $characterVest->setAmount(1);
+        $characterVest->setIsEquipped(true);
+        $manager->persist($characterVest);
 
         $edgerunner->addItem($characterGrenade);
         $edgerunner->addItem($characterMedkit);
         $edgerunner->addItem($characterAmmo);
         $edgerunner->addItem($characterLockpick);
         $edgerunner->addItem($characterStim);
+        $edgerunner->addItem($characterEyes);
+        $edgerunner->addItem($characterArms);
+        $edgerunner->addItem($characterLegs);
+        $edgerunner->addItem($characterCyberdeck);
+        $edgerunner->addItem($characterKatana);
+        $edgerunner->addItem($characterVest);
 
         /*
          * ACTIONS

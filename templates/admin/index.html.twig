@@ -76,58 +76,6 @@
                 </div>
             </div>
 
-            {# Section Shop / Stock #}
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0" style="margin:0; color: white; font-weight: bold; letter-spacing: 1px;">SHOP & STOCKS</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div style="overflow-x: auto;">
-                        <table class="table table-hover mb-0">
-                            <thead style="background-color: #f8f9fa;">
-                                <tr>
-                                    <th>Item</th>
-                                    <th>Prix</th>
-                                    <th>Stock</th>
-                                    <th style="width: 100px;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in items %}
-                                    <tr>
-                                        <td>
-                                            <strong>{{ item.name }}</strong><br>
-                                            <span class="text-muted small">{{ item.type }}</span>
-                                        </td>
-                                        <td>{{ item.price }} <span class="small">DRG</span></td>
-                                        <td>
-                                            {% if item.infiniteStock %}
-                                                <span class="badge badge-info">∞ Infini</span>
-                                            {% else %}
-                                                <span class="badge {{ (item.stock|default(0)) <= 0 ? 'badge-danger' : 'badge-secondary' }}">
-                                                    {{ item.stock|default(0) }} en stock
-                                                </span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <div style="display: flex; gap: 5px;">
-                                                <a href="{{ ea_url().setController('App\\Controller\\Admin\\ItemCrudController').setAction('edit').setEntityId(item.id) }}" class="btn btn-sm btn-outline-primary" title="Modifier">
-                                                    <i class="fa fa-pencil"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-footer bg-light">
-                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ItemCrudController').setAction('new') }}" class="btn btn-sm btn-success">
-                        <i class="fa fa-plus mr-1"></i> Ajouter un item
-                    </a>
-                </div>
-            </div>
 
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-dark text-white" style="display: flex; justify-content: space-between; align-items: center;">

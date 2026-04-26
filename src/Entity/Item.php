@@ -37,14 +37,14 @@ class Item
     #[ORM\ManyToOne]
     private ?ImageFile $illustration = null;
 
-    #[ORM\Column]
-    private ?bool $isConsume = null;
+    #[ORM\Column(options: ["default" => false])]
+    private ?bool $isConsume = false;
 
-    #[ORM\Column]
-    private ?int $price = null;
+    #[ORM\Column(options: ["default" => 0])]
+    private ?int $price = 0;
 
-    #[ORM\Column]
-    private ?int $chargePrice = null;
+    #[ORM\Column(options: ["default" => 0])]
+    private ?int $chargePrice = 0;
 
     #[ORM\Column(length: 255)]
     private ?string $description = null;
@@ -61,11 +61,11 @@ class Item
     #[ORM\OneToMany(targetEntity: Action::class, mappedBy: 'item', cascade: ['remove'])]
     private Collection $actions;
 
-    #[ORM\Column]
-    private ?bool $isLegal = null;
+    #[ORM\Column(options: ["default" => true])]
+    private ?bool $isLegal = true;
 
-    #[ORM\Column]
-    private ?bool $isCumbersome = null;
+    #[ORM\Column(options: ["default" => false])]
+    private ?bool $isCumbersome = false;
 
     #[ORM\Column(nullable: true)]
     private ?int $stock = null;
@@ -75,9 +75,6 @@ class Item
 
     #[ORM\Column(nullable: true)]
     private ?int $humanityLoss = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?bool $installed = null;
 
     public function __construct()
     {
@@ -117,18 +114,6 @@ class Item
     public function setHumanityLoss(?int $humanityLoss): static
     {
         $this->humanityLoss = $humanityLoss;
-
-        return $this;
-    }
-
-    public function isInstalled(): ?bool
-    {
-        return $this->installed;
-    }
-
-    public function setInstalled(?bool $installed): static
-    {
-        $this->installed = $installed;
 
         return $this;
     }

@@ -8,6 +8,8 @@ use App\Entity\CharacterItem;
 use App\Entity\Edgerunner;
 use App\Entity\Item;
 use App\Entity\Log;
+use App\Entity\Stuff;
+use App\Form\StuffType;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class CharacterController extends AbstractController
 {
-    #[Route('/character/item/{id}/{math}', name: 'app_character_item_quantity')]
+    #[Route('/character/item/{id}/quantity/{math}', name: 'app_character_item_quantity', requirements: ['math' => 'add|sub'])]
     public function updateItemQuantity(ManagerRegistry $manager, HubInterface $hub, CharacterItem $characterItem, string $math): Response
     {
         $character = $characterItem->getCharacter();
@@ -118,6 +120,7 @@ final class CharacterController extends AbstractController
                     $character->setStresspoints(0);
                     $character->setHumanityLoss($character->getHumanityLoss() + 5);
                     $desc = "CRISE DE NERFS ! Stress réinitialisé, +5 Perte d'humanité";
+                    $this->addFlash('breakdown', 'CRISE DE NERFS');
                     $this->createLog($manager, $hub, $character, $desc, null, true);
                     $desc = ""; // On vide desc pour ne pas logger deux fois
                 } else {
@@ -291,6 +294,55 @@ final class CharacterController extends AbstractController
         ]);
     }
 
+    #[Route('/character/summary', name: 'app_character_summary')]
+    public function summary(ManagerRegistry $manager): Response
+    {
+        $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
+        if (!$character) {
+            return $this->redirectToRoute('app_character_new');
+        }
+
+        $summary = [
+            'standards' => [],
+            'cumbersome' => [],
+            'illegal' => [],
+        ];
+
+        // Feats
+        foreach ($character->getFeats() as $cf) {
+            if ($cf->getXptot() >= ($cf->getFeat()->getXpcost() ?? 0)) {
+                $summary['standards'][] = [
+                    'name' => $cf->getFeat()->getName(),
+                    'desc' => $cf->getFeat()->getDescription(),
+                ];
+            }
+        }
+
+        // Items
+        foreach ($character->getItems() as $ci) {
+            if ($ci->isEquipped() || $ci->isInstalled()) {
+                $item = $ci->getItem();
+                $entry = [
+                    'name' => $item->getName(),
+                    'desc' => $item->getDescription(),
+                ];
+
+                if (!$item->isLegal()) {
+                    $summary['illegal'][] = $entry;
+                } elseif ($item->isCumbersome()) {
+                    $summary['cumbersome'][] = $entry;
+                } else {
+                    $summary['standards'][] = $entry;
+                }
+            }
+        }
+
+        return $this->render('main/summary.html.twig', [
+            'character' => $character,
+            'summary' => $summary,
+        ]);
+    }
+
     #[Route('/character/action/decrement/{id}/{type}', name: 'app_character_action_decrement')]
     public function decrementAction(ManagerRegistry $manager, HubInterface $hub, int $id, string $type): Response
     {
@@ -358,6 +410,77 @@ final class CharacterController extends AbstractController
 
         return $this->redirectToRoute('app_character_actions');
     }
+    #[Route('/character/item/{id}/install', name: 'app_character_item_install')]
+    public function installItem(ManagerRegistry $manager, HubInterface $hub, CharacterItem $characterItem): Response
+    {
+        $character = $characterItem->getCharacter();
+        if ($character->getPlayer() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $item = $characterItem->getItem();
+        if ($item->getType() !== Item::TYPE_CYBERWARE) {
+            return $this->redirectToRoute('app_character_items');
+        }
+
+        if (!$characterItem->isInstalled()) {
+            $characterItem->setIsInstalled(true);
+            $loss = $item->getHumanityLoss() ?? 0;
+            $character->setHumanityLoss($character->getHumanityLoss() + $loss);
+            $this->createLog($manager, $hub, $character, "Installation de " . $item->getName(), -$loss);
+            
+            $manager->getManager()->flush();
+        }
+
+        return $this->redirectToRoute('app_character_items');
+    }
+
+    #[Route('/character/item/{id}/equip', name: 'app_character_item_equip')]
+    public function equipItem(ManagerRegistry $manager, CharacterItem $characterItem): Response
+    {
+        $character = $characterItem->getCharacter();
+        if ($character->getPlayer() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $item = $characterItem->getItem();
+        if ($item->getType() !== Item::TYPE_EQUIPEMENT) {
+            return $this->redirectToRoute('app_character_items');
+        }
+
+        $characterItem->setIsEquipped(!$characterItem->isEquipped());
+
+        $manager->getManager()->flush();
+        return $this->redirectToRoute('app_character_items');
+    }
+
+    #[Route('/character/stuff/new', name: 'app_stuff_new')]
+    public function newStuff(ManagerRegistry $manager, Request $request): Response
+    {
+        $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
+        if (!$character) {
+            return $this->redirectToRoute('app_character_new');
+        }
+
+        $stuff = new Stuff();
+        $stuff->setCharacter($character);
+        $form = $this->createForm(StuffType::class, $stuff);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $manager->getManager();
+            $em->persist($stuff);
+            $em->flush();
+
+            return $this->redirectToRoute('app_character_items');
+        }
+
+        return $this->render('character/new_stuff.html.twig', [
+            'form' => $form->createView(),
+            'character' => $character,
+        ]);
+    }
+
     private function createLog(ManagerRegistry $manager, HubInterface $hub, Edgerunner $character, string $description, ?int $amount = null, bool $isCritical = false): void
     {
         $log = new Log();

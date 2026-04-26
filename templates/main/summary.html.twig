@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Résumé des effets - {{ character.nom }}{% endblock %}
+
+{% block body %}
+    <div class="app-shell max-w-md mx-auto pb-28">
+        <header class="app-header mb-4">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.28em] text-muted text-neon">
+                        Edgerunner interface
+                    </p>
+                    <h1 class="text-2xl font-bold text-app">
+                        Résumé
+                    </h1>
+                </div>
+                <a href="{{ path('app_character_actions') }}" class="flex items-center gap-2 rounded-lg border border-app/30 bg-app/5 px-3 py-2 text-xs font-bold uppercase tracking-wider text-app transition-all hover:bg-app/20 active:scale-95">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour
+                </a>
+            </div>
+        </header>
+
+        <div class="space-y-6">
+            <section class="card card--neon scanlines">
+                <div class="space-y-6">
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-accent text-neon">Effets actifs</h2>
+
+                    <div class="space-y-6">
+                        {# Standards & Feats #}
+                        {% if summary.standards|length > 0 %}
+                            <div class="space-y-2">
+                                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-app/50 border-b border-app/20 pb-1">Standards & Feats</h3>
+                                <div class="space-y-3">
+                                    {% for entry in summary.standards %}
+                                        <div class="bg-app/5 rounded-xl p-4 border border-app/10 backdrop-blur-sm">
+                                            <div class="text-[11px] font-bold uppercase tracking-wider text-app mb-1">{{ entry.name }}</div>
+                                            <div class="text-xs text-muted italic leading-relaxed">"{{ entry.desc }}"</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {# Encombrants #}
+                        {% if summary.cumbersome|length > 0 %}
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2 border-b border-orange-500/20 pb-1">
+                                    <div class="w-2 h-2 bg-orange-500"></div>
+                                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500/50">Encombrants</h3>
+                                </div>
+                                <div class="space-y-3">
+                                    {% for entry in summary.cumbersome %}
+                                        <div class="bg-orange-500/5 rounded-xl p-4 border border-orange-500/10 backdrop-blur-sm">
+                                            <div class="text-[11px] font-bold uppercase tracking-wider text-orange-500 mb-1">{{ entry.name }}</div>
+                                            <div class="text-xs text-muted italic leading-relaxed">"{{ entry.desc }}"</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {# Illégaux #}
+                        {% if summary.illegal|length > 0 %}
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2 border-b border-danger/20 pb-1">
+                                    <div class="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[8px] border-b-red-600"></div>
+                                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-danger/50">Illégaux</h3>
+                                </div>
+                                <div class="space-y-3">
+                                    {% for entry in summary.illegal %}
+                                        <div class="bg-danger/5 rounded-xl p-4 border border-danger/10 backdrop-blur-sm">
+                                            <div class="text-[11px] font-bold uppercase tracking-wider text-danger mb-1">{{ entry.name }}</div>
+                                            <div class="text-xs text-muted italic leading-relaxed">"{{ entry.desc }}"</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if summary.standards|length == 0 and summary.cumbersome|length == 0 and summary.illegal|length == 0 %}
+                            <div class="py-12 text-center">
+                                <div class="text-4xl opacity-10 mb-4 text-app">∅</div>
+                                <p class="text-sm text-muted uppercase tracking-widest italic font-bold">Aucun effet actif détecté</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            {% include "main/_nav.html.twig" %}
+        </div>
+    </div>
+{% endblock %}

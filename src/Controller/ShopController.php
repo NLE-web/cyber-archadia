@@ -42,7 +42,7 @@ final class ShopController extends AbstractController
     {
         $entityManager = $manager->getManager();
         $character = $entityManager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
-        
+
         if (!$character) {
             return $this->redirectToRoute('app_character_new');
         }
@@ -61,7 +61,7 @@ final class ShopController extends AbstractController
 
         // Procéder à l'achat
         $character->setMoney($character->getMoney() - $item->getPrice());
-        
+
         if (!$item->isInfiniteStock()) {
             $item->setStock($item->getStock() - 1);
         }
