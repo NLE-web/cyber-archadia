@@ -481,6 +481,45 @@ final class CharacterController extends AbstractController
         ]);
     }
 
+    #[Route('/character/stuff/{id}/edit', name: 'app_stuff_edit')]
+    public function editStuff(ManagerRegistry $manager, Request $request, Stuff $stuff): Response
+    {
+        if ($stuff->getCharacter()->getPlayer() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $form = $this->createForm(StuffType::class, $stuff);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $manager->getManager()->flush();
+
+            return $this->redirectToRoute('app_character_items');
+        }
+
+        return $this->render('character/edit_stuff.html.twig', [
+            'form' => $form->createView(),
+            'character' => $stuff->getCharacter(),
+            'stuff' => $stuff,
+        ]);
+    }
+
+    #[Route('/character/stuff/{id}/delete', name: 'app_stuff_delete', methods: ['POST'])]
+    public function deleteStuff(ManagerRegistry $manager, Request $request, Stuff $stuff): Response
+    {
+        if ($stuff->getCharacter()->getPlayer() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($this->isCsrfTokenValid('delete' . $stuff->getId(), $request->request->get('_token'))) {
+            $em = $manager->getManager();
+            $em->remove($stuff);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('app_character_items');
+    }
+
     private function createLog(ManagerRegistry $manager, HubInterface $hub, Edgerunner $character, string $description, ?int $amount = null, bool $isCritical = false): void
     {
         $log = new Log();
