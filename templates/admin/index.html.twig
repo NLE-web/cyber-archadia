@@ -34,6 +34,110 @@
 
     <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
         <div style="flex: 1; min-width: 300px;">
+            {# Section Social #}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white" style="background-color: #6f42c1 !important;">
+                    <h5 class="mb-0" style="margin:0; color: white; font-weight: bold; letter-spacing: 1px;">COMMUNICATION SOCIALE</h5>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h6 class="mb-3">Ajouter un contact à un joueur</h6>
+                            <form action="{{ path('admin_social_contact_add') }}" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
+                                <div>
+                                    <label class="small text-muted">Joueur / Personnage</label>
+                                    <select name="character_id" class="form-control" required>
+                                        {% for character in characters %}
+                                            <option value="{{ character.id }}">{{ character.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="small text-muted">Contact à ajouter</label>
+                                    <select name="contact_id" class="form-control" required>
+                                        {% for contact in contacts %}
+                                            <option value="{{ contact.id }}">{{ contact.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm" style="background-color: #6f42c1; border-color: #6f42c1;">
+                                    Ajouter le contact
+                                </button>
+                            </form>
+                        </div>
+                        <div style="max-height: 500px; overflow-y: auto;">
+                            <h6 class="mb-3">Liste des Conversations</h6>
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                {% for conv in conversations %}
+                                    {% set playerUnread = 0 %}
+                                    {% for msg in conv.messages %}
+                                        {% if not msg.isFromContact and not msg.isRead %}
+                                            {% set playerUnread = playerUnread + 1 %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    <a href="{{ path('admin', {conversation_id: conv.id}) }}" 
+                                       style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid {{ activeConversation and activeConversation.id == conv.id ? '#6f42c1' : '#eee' }}; border-radius: 8px; background: {{ activeConversation and activeConversation.id == conv.id ? '#f3eef9' : '#fff' }}; text-decoration: none; color: inherit;">
+                                        <div style="min-width: 0; flex: 1;">
+                                            <div style="font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                {{ conv.character.nom }} ↔ {{ conv.contact.name }}
+                                            </div>
+                                            {% if conv.messages|length > 0 %}
+                                                <div style="font-size: 11px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {{ conv.messages.last.content }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        {% if playerUnread > 0 %}
+                                            <span class="badge badge-danger" style="margin-left: 10px;">{{ playerUnread }}</span>
+                                        {% endif %}
+                                    </a>
+                                {% else %}
+                                    <p class="text-muted small text-center py-4">Aucune conversation.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; height: 100%; min-height: 400px; border-left: 1px solid #eee; padding-left: 20px;">
+                            {% if activeConversation %}
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #6f42c1;">
+                                    <h6 class="mb-0">Conversation avec <strong>{{ activeConversation.character.nom }}</strong></h6>
+                                    <span class="badge badge-info">Agent: {{ activeConversation.contact.name }}</span>
+                                </div>
+                                
+                                <div id="admin-chat-container" style="flex: 1; max-height: 350px; overflow-y: auto; margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; display: flex; flex-direction: column; gap: 8px;">
+                                    {% for msg in activeConversation.messages %}
+                                        <div style="max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.4; 
+                                            {{ msg.isFromContact ? 'align-self: flex-end; background: #6f42c1; color: white;' : 'align-self: flex-start; background: #e9ecef; color: #212529;' }}">
+                                            <strong>{{ msg.isFromContact ? activeConversation.contact.name : activeConversation.character.nom }}:</strong><br>
+                                            {{ msg.content|nl2br }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <form action="{{ path('admin_social_send') }}" method="POST" style="display: flex; gap: 10px;">
+                                    <input type="hidden" name="conversation_id" value="{{ activeConversation.id }}">
+                                    <textarea name="content" class="form-control" rows="2" placeholder="Écrire en tant que {{ activeConversation.contact.name }}..." required style="resize: none; font-size: 13px;"></textarea>
+                                    <button type="submit" class="btn btn-primary" style="background-color: #6f42c1; border-color: #6f42c1; align-self: stretch;">Envoyer</button>
+                                </form>
+                                
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        var chatContainer = document.getElementById('admin-chat-container');
+                                        if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+                                    });
+                                </script>
+                            {% else %}
+                                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #999;">
+                                    <i class="fa fa-comments" style="font-size: 48px; margin-bottom: 15px; opacity: 0.2;"></i>
+                                    <p>Sélectionnez une conversation pour lire les messages et répondre.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {# Section Level Up #}
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-info text-white">
@@ -144,9 +248,21 @@
             const content = document.getElementById('logs-card-content');
             const toggleAllBtn = document.getElementById('toggle-all-logs');
             const url = "{{ mercure_url|raw }}";
+            const socialUrl = "{{ mercure_social_url|raw }}";
             
             let showAll = true;
             const LOG_LIMIT = 20;
+
+            // Mercure Social
+            const socialEventSource = new EventSource(socialUrl);
+            socialEventSource.onmessage = event => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'message') {
+                    // Si on est sur la conversation active, on recharge pour voir le message
+                    // Sinon on recharge quand même pour mettre à jour la liste et les compteurs
+                    window.location.reload();
+                }
+            };
 
             // Masquage complet
             collapseBtn.addEventListener('click', () => {

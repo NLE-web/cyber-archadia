@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Action;
+use App\Entity\Action as ActionEntity;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -14,7 +14,7 @@ class ActionCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return Action::class;
+        return ActionEntity::class;
     }
 
     public function configureFields(string $pageName): iterable
@@ -24,7 +24,7 @@ class ActionCrudController extends AbstractCrudController
             TextField::new('name', 'Nom'),
             TextField::new('type', 'Type'),
             TextField::new('description', 'Description'),
-            ChoiceField::new('usage', 'Usage')->setChoices(Action::USAGES),
+            ChoiceField::new('usage', 'Usage')->setChoices(ActionEntity::USAGES),
             IntegerField::new('maxUse', 'Max Utilisations'),
             AssociationField::new('item', 'Item lié'),
         ];

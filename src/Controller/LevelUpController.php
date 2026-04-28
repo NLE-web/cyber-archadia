@@ -191,7 +191,7 @@ final class LevelUpController extends AbstractController
                 'amount' => $amount,
                 'description' => $description,
                 'isCritical' => $isCritical,
-                'date' => $log->getCreatedAt()->format('H:i:s')
+                'date' => $log->getCreatedAt() ? $log->getCreatedAt()->format('H:i:s') : date('H:i:s')
             ])
         ));
     }

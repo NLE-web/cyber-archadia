@@ -90,6 +90,12 @@ class Edgerunner
     #[ORM\OneToMany(targetEntity: Stuff::class, mappedBy: 'character', cascade: ['persist', 'remove'])]
     private Collection $stuffs;
 
+    /**
+     * @var Collection<int, CharacterContact>
+     */
+    #[ORM\OneToMany(targetEntity: CharacterContact::class, mappedBy: 'character', orphanRemoval: true)]
+    private Collection $characterContacts;
+
     public function __construct()
     {
         $this->skills = new ArrayCollection();
@@ -97,6 +103,7 @@ class Edgerunner
         $this->actions = new ArrayCollection();
         $this->feats = new ArrayCollection();
         $this->stuffs = new ArrayCollection();
+        $this->characterContacts = new ArrayCollection();
     }
     public function getHumanityLoss(): ?int
     {
@@ -432,6 +439,36 @@ class Edgerunner
             // set the owning side to null (unless already changed)
             if ($stuff->getCharacter() === $this) {
                 $stuff->setCharacter(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CharacterContact>
+     */
+    public function getCharacterContacts(): Collection
+    {
+        return $this->characterContacts;
+    }
+
+    public function addCharacterContact(CharacterContact $characterContact): static
+    {
+        if (!$this->characterContacts->contains($characterContact)) {
+            $this->characterContacts->add($characterContact);
+            $characterContact->setCharacter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCharacterContact(CharacterContact $characterContact): static
+    {
+        if ($this->characterContacts->removeElement($characterContact)) {
+            // set the owning side to null (unless already changed)
+            if ($characterContact->getCharacter() === $this) {
+                $characterContact->setCharacter(null);
             }
         }
 
