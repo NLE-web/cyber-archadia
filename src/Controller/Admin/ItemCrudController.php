@@ -26,7 +26,6 @@ class ItemCrudController extends AbstractCrudController
             ChoiceField::new('type', 'Type')->setChoices(array_flip(Item::TYPES)),
             BooleanField::new('isLegal', 'Légal'),
             BooleanField::new('isCumbersome', 'Encombrant'),
-            AssociationField::new('illustration', 'Illustration'),
             BooleanField::new('isConsume', 'Consommable (Mécanique d\'usage)'),
             IntegerField::new('price', 'Prix'),
             IntegerField::new('chargePrice', 'Prix de recharge'),
