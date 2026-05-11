@@ -185,14 +185,7 @@
     {% if condensed %}
         <details class="group">
             <summary class="flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl border border-app/50 bg-panel/40 p-2 transition-all hover:bg-panel-2">
-                <div class="flex items-center gap-2 min-w-0">
-                    <div class="h-6 w-6 shrink-0 rounded border border-app/30 bg-panel-2 overflow-hidden flex items-center justify-center">
-                        {% if item.illustration %}
-                            {% set illustrationPath = 'uploads/images/' ~ item.illustration.storageName %}
-                            {% if item.illustration.storageName == 'item.png' %}{% set illustrationPath = 'img-asset/item.png' %}{% endif %}
-                            <img src="{{ asset(illustrationPath) }}" class="h-4 w-4 object-contain opacity-70">
-                        {% endif %}
-                    </div>
+                <div class="flex items-center min-w-0">
                     <div class="truncate text-[11px] font-semibold uppercase tracking-wider text-app/80">
                         {{ item.name }}
                         {% if ci.amount > 1 and not ci.isEquipped %}<span class="ml-1 text-accent">(x{{ ci.amount }})</span>{% endif %}
