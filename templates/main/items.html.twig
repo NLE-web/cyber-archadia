@@ -155,7 +155,7 @@
                                                 </div>
                                             </summary>
                                             <div class="mt-1 px-3 py-2 text-[10px] text-muted border-t border-app/10 bg-panel/30 rounded-b-xl">
-                                                {{ stuff.description }}
+                                                {{ stuff.description|parse_description }}
                                             </div>
                                         </details>
                                     {% endfor %}
@@ -209,7 +209,7 @@
                 </div>
             </summary>
             <div class="mt-1 px-3 py-2 text-[10px] text-muted border-t border-app/10 bg-panel/30 rounded-b-xl">
-                {{ item.description }}
+                {{ item.description|parse_description }}
             </div>
         </details>
     {% else %}
@@ -254,7 +254,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="mt-3 text-xs text-muted">{{ item.description }}</div>
+                    <div class="mt-3 text-xs text-muted">{{ item.description|parse_description }}</div>
                 </div>
                 {% if item.type == constant('App\\Entity\\Item::TYPE_CONSOMMABLE') and not ci.isEquipped %}
                     <div class="flex flex-col border-l border-app bg-panel-2/30">

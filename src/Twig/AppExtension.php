@@ -14,9 +14,12 @@ class AppExtension extends \Twig\Extension\AbstractExtension
     public function parseDescription(string $content): string
     {
         // [portee|courte-moyenne|longue]
-        $content = preg_replace_callback('/\[portee\|([^\|]+)\|([^\]]+)\]/', function ($matches) {
-            $greenParts = explode('-', $matches[1]);
-            $redParts = explode('-', $matches[2]);
+        $content = preg_replace_callback('/\[portee\|([^\|\]]+)\|?([^\]]*)\]/', function ($matches) {
+            $greenPartsStr = $matches[1] ?? '';
+            $redPartsStr = $matches[2] ?? '';
+            
+            $greenParts = $greenPartsStr !== '' ? explode('-', $greenPartsStr) : [];
+            $redParts = $redPartsStr !== '' ? explode('-', $redPartsStr) : [];
             
             $html = 'portée ';
             foreach ($greenParts as $part) {
@@ -31,7 +34,7 @@ class AppExtension extends \Twig\Extension\AbstractExtension
         // [token|poison]
         $content = preg_replace_callback('/\[token\|([^\]]+)\]/', function ($matches) {
             $token = htmlspecialchars($matches[1]);
-            return '<i class="fas fa-circle text-accent" title="' . $token . '"></i>';
+            return '<i class="fas fa-certificate text-accent" title="' . $token . '"></i>';
         }, $content);
 
         // [de|x]
