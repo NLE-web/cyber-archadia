@@ -21,14 +21,12 @@ class RegistrationFormType extends AbstractType
                 'label' => 'Nom d\'utilisateur',
                 'attr' => ['autocomplete' => 'username'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer un nom d\'utilisateur',
-                    ]),
-                    new Length([
-                        'min' => 3,
-                        'minMessage' => 'Votre nom d\'utilisateur doit contenir au moins {{ limit }} caractères',
-                        'max' => 255,
-                    ]),
+                    new NotBlank(message: 'Veuillez entrer un nom d\'utilisateur'),
+                    new Length(
+                        min: 3,
+                        minMessage: 'Votre nom d\'utilisateur doit contenir au moins {{ limit }} caractères',
+                        max: 255,
+                    ),
                 ],
             ])
             ->add('plainPassword', RepeatedType::class, [
@@ -39,15 +37,13 @@ class RegistrationFormType extends AbstractType
                 'second_options' => ['label' => 'Répéter le mot de passe'],
                 'invalid_message' => 'Les mots de passe ne correspondent pas.',
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer un mot de passe',
-                    ]),
-                    new Length([
-                        'min' => 6,
-                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
+                    new NotBlank(message: 'Veuillez entrer un mot de passe'),
+                    new Length(
+                        min: 6,
+                        minMessage: 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
                         // max length allowed by Symfony for security reasons
-                        'max' => 4096,
-                    ]),
+                        max: 4096,
+                    ),
                 ],
             ])
         ;
