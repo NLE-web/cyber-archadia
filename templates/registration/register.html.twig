@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}S'enregistrer{% endblock %}
+
+{% block body %}
+    <div class="flex min-h-full items-center justify-center">
+        <div class="w-full max-w-xs">
+            <header class="mb-6 text-center">
+                <p class="text-xs uppercase tracking-[0.28em] text-muted text-neon">
+                    New Edgerunner registration
+                </p>
+                <h2 class="mt-2 text-lg font-semibold text-white">
+                    Création de compte
+                </h2>
+            </header>
+            <section class="rounded-2xl border border-app bg-gradient-panel p-5 shadow-neon scanlines">
+                {{ form_errors(registrationForm) }}
+
+                {{ form_start(registrationForm, {'attr': {'class': 'space-y-4'}}) }}
+                    <div>
+                        {{ form_label(registrationForm.username, null, {'label_attr': {'class': 'mb-2 block text-xs uppercase tracking-[0.2em] text-muted'}}) }}
+                        {{ form_widget(registrationForm.username, {'attr': {
+                            'class': 'w-full rounded-xl border border-app bg-panel px-4 py-3 text-sm text-app',
+                            'placeholder': 'Votre identifiant'
+                        }}) }}
+                        {{ form_errors(registrationForm.username) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(registrationForm.plainPassword.first, null, {'label_attr': {'class': 'mb-2 block text-xs uppercase tracking-[0.2em] text-muted'}}) }}
+                        {{ form_widget(registrationForm.plainPassword.first, {'attr': {
+                            'class': 'w-full rounded-xl border border-app bg-panel px-4 py-3 text-sm text-app',
+                            'placeholder': '••••••••'
+                        }}) }}
+                        {{ form_errors(registrationForm.plainPassword.first) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(registrationForm.plainPassword.second, null, {'label_attr': {'class': 'mb-2 block text-xs uppercase tracking-[0.2em] text-muted'}}) }}
+                        {{ form_widget(registrationForm.plainPassword.second, {'attr': {
+                            'class': 'w-full rounded-xl border border-app bg-panel px-4 py-3 text-sm text-app',
+                            'placeholder': '••••••••'
+                        }}) }}
+                        {{ form_errors(registrationForm.plainPassword.second) }}
+                    </div>
+
+                    <button class="w-full rounded-xl border border-accent bg-gradient-accent px-4 py-3 text-sm font-semibold text-black shadow-neon-soft">
+                        Créer le compte
+                    </button>
+                {{ form_end(registrationForm) }}
+
+                <div class="mt-4 text-center">
+                    <p class="text-xs text-muted">
+                        Déjà inscrit ? 
+                        <a href="{{ path('app_login') }}" class="text-accent hover:underline">Connexion</a>
+                    </p>
+                </div>
+            </section>
+        </div>
+    </div>
+{% endblock %}
