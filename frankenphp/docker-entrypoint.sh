@@ -26,6 +26,10 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		composer install --prefer-dist --no-progress --no-interaction
 	fi
 
+	# Ensure upload directory exists and is writable
+	mkdir -p public/uploads/images
+	chmod -R 777 public/uploads/images
+
 	# Display information about the current project
 	# Or about an error in project initialization
 	php bin/console -V

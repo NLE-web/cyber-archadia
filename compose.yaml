@@ -20,6 +20,7 @@ services:
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+      - app_uploads:/app/public/uploads/images
     ports:
       - name: http
         target: 80
@@ -60,6 +61,7 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  app_uploads:
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
 

@@ -13,7 +13,7 @@ FROM frankenphp_upstream AS frankenphp_base
 
 WORKDIR /app
 
-VOLUME /app/var/
+VOLUME /app/var/ /app/public/uploads/images/
 
 # persistent / runtime deps
 # hadolint ignore=DL3008
@@ -87,7 +87,7 @@ RUN set -eux; \
 COPY --link --exclude=frankenphp/ . ./
 
 RUN set -eux; \
-	mkdir -p var/cache var/log var/share; \
+	mkdir -p var/cache var/log var/share public/uploads/images; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
 	composer dump-env prod; \
 	composer run-script --no-dev post-install-cmd; \
