@@ -14,21 +14,32 @@ class AppExtension extends \Twig\Extension\AbstractExtension
     public function parseDescription(string $content): string
     {
         // [portee|courte-moyenne|longue]
-        $content = preg_replace_callback('/\[portee\|([^\|\]]+)\|?([^\]]*)\]/', function ($matches) {
+        $content = preg_replace_callback('/\[portee\|([^\|\]]*)\|?([^\]]*)\]/', function ($matches) {
             $greenPartsStr = $matches[1] ?? '';
             $redPartsStr = $matches[2] ?? '';
             
             $greenParts = $greenPartsStr !== '' ? explode('-', $greenPartsStr) : [];
             $redParts = $redPartsStr !== '' ? explode('-', $redPartsStr) : [];
             
-            $html = 'portée ';
+            $map = [
+                'courte' => 'C',
+                'moyenne' => 'M',
+                'longue' => 'L'
+            ];
+
+            $results = [];
+
             foreach ($greenParts as $part) {
-                $html .= '<span class="text-green-500">' . htmlspecialchars($part) . '</span> ';
+                $letter = $map[strtolower($part)] ?? $part;
+                $results[] = '<span class="text-green-500">' . htmlspecialchars($letter) . '</span>';
             }
+
             foreach ($redParts as $part) {
-                $html .= '<span class="text-red-500">' . htmlspecialchars($part) . '</span> ';
+                $letter = $map[strtolower($part)] ?? $part;
+                $results[] = '<span class="text-red-500">' . htmlspecialchars($letter) . '</span>';
             }
-            return trim($html);
+
+            return '[' . implode('/', $results) . ']';
         }, $content);
 
         // [token|poison]

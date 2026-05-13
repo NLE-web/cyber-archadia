@@ -63,9 +63,13 @@
                     {% endif %}
                 </header>
 
-                <main class="flex-1 overflow-y-auto" id="main-container">
+                <main class="flex-1 overflow-y-auto pb-24" id="main-container">
                     {% block body %}{% endblock %}
                 </main>
+
+                {% if is_granted('ROLE_USER') %}
+                    {% include "main/_nav.html.twig" %}
+                {% endif %}
 
                 {% if is_granted('ROLE_USER') %}
                     <script type="text/javascript">
