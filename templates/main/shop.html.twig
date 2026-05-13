@@ -80,7 +80,9 @@
 
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
-            const eventSource = new EventSource("{{ (mercure_public_url|default('https://example.com/.well-known/mercure')) ~ '?topic=' ~ ('https://archadia.net/shop'|url_encode) }}");
+            const mercureUrl = "{{ mercure_public_url|default('https://example.com/.well-known/mercure') }}";
+            const topic = encodeURIComponent('https://archadia.net/shop');
+            const eventSource = new EventSource(`${mercureUrl}?topic=${topic}`);
 
             eventSource.onmessage = event => {
                 // On recharge la page pour mettre à jour les stocks et prix

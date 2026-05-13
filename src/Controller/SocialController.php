@@ -26,7 +26,6 @@ class SocialController extends AbstractController
 
         return $this->render('social/index.html.twig', [
             'character' => $character,
-            'mercure_public_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? null,
         ]);
     }
 
@@ -76,7 +75,6 @@ class SocialController extends AbstractController
         return $this->render('social/conversation.html.twig', [
             'characterContact' => $characterContact,
             'character' => $characterContact->getCharacter(),
-            'mercure_public_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? null,
         ]);
     }
 }

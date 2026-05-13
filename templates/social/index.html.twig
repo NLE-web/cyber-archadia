@@ -65,7 +65,8 @@
 
     <script>
         const socialUrl = "https://archadia.net/social/{{ character.id }}";
-        const eventSource = new EventSource("{{ mercure_public_url|default('https://example.com/.well-known/mercure') }}?topic=" + encodeURIComponent(socialUrl));
+        const mercureUrl = "{{ mercure_public_url|default('https://example.com/.well-known/mercure') }}";
+        const eventSource = new EventSource(mercureUrl + "?topic=" + encodeURIComponent(socialUrl));
         
         eventSource.onmessage = event => {
             const data = JSON.parse(event.data);

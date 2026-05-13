@@ -90,7 +90,6 @@ class DashboardController extends AbstractDashboardController
             'latestLogs' => $latestLogs,
             'mercure_url' => $mercureUrl . '?topic=' . rawurlencode('https://archadia.net/logs'),
             'mercure_social_url' => $mercureUrl . '?topic=' . rawurlencode('https://archadia.net/social/admin'),
-            'mercure_public_url' => $mercureUrl,
             'levelUpActive' => $levelUpActive,
             'items' => $items,
             'characters' => $characters,

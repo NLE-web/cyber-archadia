@@ -172,7 +172,6 @@ final class CharacterController extends AbstractController
             "character" => $character,
             "allSkills" => $allSkills,
             "allFeats" => $allFeats,
-            "mercure_public_url" => $_ENV['MERCURE_PUBLIC_URL'] ?? 'https://example.com/.well-known/mercure',
         ]);
     }
     #[Route('/character/items', name: 'app_character_items')]

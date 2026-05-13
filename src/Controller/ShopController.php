@@ -33,7 +33,6 @@ final class ShopController extends AbstractController
         return $this->render('main/shop.html.twig', [
             'character' => $character,
             'items' => $availableItems,
-            'mercure_public_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? 'https://example.com/.well-known/mercure',
         ]);
     }
 
