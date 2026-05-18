@@ -167,6 +167,17 @@ class DashboardController extends AbstractDashboardController
             foreach ($users as $user) {
                 $user->setDowntimeActive($newState);
             }
+
+        // Si on désactive, on reset les downtimes
+            if (!$newState) {
+                $edts = $this->entityManager->getRepository(EdgeRunnerDownTime::class)->findAll();
+                foreach ($edts as $edt) {
+                    if ($edt->isDraft()) {
+                        $edt->setDiscard(true);
+                    }
+                }
+            }
+
             $this->entityManager->flush();
         }
 

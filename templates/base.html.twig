@@ -120,6 +120,10 @@
                                 } else {
                                     bannerDowntime.classList.add('h-0', 'opacity-0', 'pointer-events-none');
                                     bannerDowntime.classList.remove('h-auto', 'opacity-100', 'py-2');
+                                    // Redirection si on est sur la page downtime
+                                    if (window.location.pathname.includes('/character/downtime')) {
+                                        window.location.href = "{{ path('app_main') }}";
+                                    }
                                 }
                             };
                         });
