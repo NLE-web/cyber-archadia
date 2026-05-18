@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Downtime - {{ character.nom }}{% endblock %}
+
+{% block body %}
+<div class="flex flex-col gap-6 animate-fade-in pb-20">
+    <div class="flex items-center justify-between border-b border-app pb-4">
+        <h2 class="text-2xl font-bold tracking-tighter text-accent">DOWNTIME</h2>
+        <span class="text-xs font-bold uppercase tracking-widest text-muted-app">Session Active</span>
+    </div>
+
+    <div class="space-y-4">
+        {% for edt in downtimes %}
+            <div class="group border border-app bg-app-lighter rounded-xl overflow-hidden transition-all duration-300 {{ edt.discard ? 'opacity-50 grayscale' : 'hover:border-accent' }}">
+                {# Header cliquable pour l'accordéon #}
+                <div class="p-4 flex items-center justify-between cursor-pointer select-none" onclick="toggleDowntime({{ edt.id }})">
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-accent uppercase tracking-widest mb-1">
+                            {{ edt.downtime.timeCost }} HEURE{{ edt.downtime.timeCost > 1 ? 'S' : '' }}
+                        </span>
+                        <h3 class="text-lg font-bold text-app leading-tight">{{ edt.downtime.title }}</h3>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        {% if edt.downtime.forced %}
+                            <span class="text-[10px] bg-red-500/20 text-red-500 border border-red-500/50 px-2 py-0.5 rounded uppercase font-bold">Forcé</span>
+                        {% endif %}
+                        {% if edt.discard %}
+                            <i class="fas fa-check-circle text-green-500"></i>
+                        {% else %}
+                            <i id="chevron-{{ edt.id }}" class="fas fa-chevron-down text-muted-app transition-transform duration-300"></i>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Contenu déployé #}
+                <div id="content-{{ edt.id }}" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-black/20">
+                    <div class="p-4 border-t border-app/50 space-y-4">
+                        <div class="text-sm text-app-light leading-relaxed italic">
+                            "{{ edt.downtime.description }}"
+                        </div>
+                        
+                        <div class="bg-accent/10 border border-accent/20 p-3 rounded-lg">
+                            <span class="text-[10px] font-bold text-accent uppercase block mb-1">Effet</span>
+                            <div class="text-sm text-app">
+                                {{ edt.downtime.effet|parse_description }}
+                            </div>
+                            {% if edt.effetBonus %}
+                                <div class="mt-2 pt-2 border-t border-accent/20">
+                                    <span class="text-[10px] font-bold text-blue-400 uppercase block mb-1">Bonus MJ</span>
+                                    <div class="text-sm text-app font-semibold">
+                                        {{ edt.effetBonus }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {% if not edt.discard %}
+                            <form action="{{ path('app_character_downtime_validate', {id: edt.id}) }}" method="POST">
+                                <button type="submit" class="w-full py-3 bg-accent text-white font-bold uppercase tracking-widest text-xs rounded-lg hover:bg-accent-light transition-colors shadow-lg shadow-accent/20">
+                                    Valider cette activité
+                                </button>
+                            </form>
+                        {% else %}
+                            <div class="text-center py-2 text-xs font-bold uppercase text-green-500 tracking-widest">
+                                <i class="fas fa-check mr-2"></i> Activité complétée
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-12 border border-dashed border-app rounded-2xl">
+                <i class="fas fa-couch text-4xl text-muted-app/20 mb-4 block"></i>
+                <p class="text-muted-app text-sm">Aucune activité de downtime disponible pour le moment.</p>
+                <p class="text-xs text-muted-app/60 mt-1">Le MJ doit vous assigner des options.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if downtimes|length > 0 %}
+        <div class="mt-8 p-4 bg-accent/5 rounded-2xl border border-accent/10">
+            <h4 class="text-xs font-bold text-accent uppercase tracking-widest mb-2 flex items-center gap-2">
+                <i class="fas fa-info-circle"></i> Rappel Downtime
+            </h4>
+            <p class="text-xs text-muted-app leading-relaxed">
+                Le downtime représente vos activités entre les missions. Une fois validé, l'effet est appliqué et le MJ est notifié. Choisissez judicieusement comment occuper votre temps libre dans Archadia.
+            </p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleDowntime(id) {
+        const content = document.getElementById('content-' + id);
+        const chevron = document.getElementById('chevron-' + id);
+        
+        // Fermer les autres ? Optionnel, ici on laisse libre.
+        
+        if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+            content.style.maxHeight = '0px';
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+        } else {
+            content.style.maxHeight = content.scrollHeight + 'px';
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+        }
+    }
+</script>
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
