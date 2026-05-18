@@ -73,7 +73,15 @@ class DashboardController extends AbstractDashboardController
         $characters = $this->entityManager->getRepository(Edgerunner::class)->findAll();
         $contacts = $this->entityManager->getRepository(Contact::class)->findAll();
         $conversations = $this->entityManager->getRepository(CharacterContact::class)->findAll();
-        $discardedDowntimes = $this->entityManager->getRepository(EdgeRunnerDownTime::class)->findBy(['selected' => true]);
+        $discardedDowntimes = $this->entityManager->getRepository(EdgeRunnerDownTime::class)->createQueryBuilder('edt')
+            ->join('edt.downtime', 'd')
+            ->where('edt.selected = :selected')
+            ->orWhere('d.forced = :forced AND edt.draft = :draft')
+            ->setParameter('selected', true)
+            ->setParameter('forced', true)
+            ->setParameter('draft', true)
+            ->getQuery()
+            ->getResult();
         
         $conversationId = $request->query->get('conversation_id');
         $activeConversation = null;
@@ -170,8 +178,50 @@ class DashboardController extends AbstractDashboardController
 
         // Si on désactive, on reset les downtimes
             if (!$newState) {
-                $edts = $this->entityManager->getRepository(EdgeRunnerDownTime::class)->findAll();
+                $edts = $this->entityManager->getRepository(EdgeRunnerDownTime::class)->findBy(['draft' => true]);
+                
+                // Grouper par Edgerunner pour faire un log par joueur
+                $byCharacter = [];
                 foreach ($edts as $edt) {
+                    if ($edt->isSelected() || $edt->getDowntime()->isForced()) {
+                        $charId = $edt->getEdgerunner()->getId();
+                        if (!isset($byCharacter[$charId])) {
+                            $byCharacter[$charId] = [
+                                'character' => $edt->getEdgerunner(),
+                                'titles' => []
+                            ];
+                        }
+                        $byCharacter[$charId]['titles'][] = $edt->getDowntime()->getTitle();
+                    }
+                }
+
+                foreach ($byCharacter as $data) {
+                    $character = $data['character'];
+                    $titlesStr = implode(', ', $data['titles']);
+                    $description = "Downtimes effectués : " . $titlesStr;
+                    
+                    $log = new Log();
+                    $log->setCharacter($character);
+                    $log->setDescription($description);
+                    $log->setIsCritical(true);
+                    $this->entityManager->persist($log);
+
+                    // Notification Mercure pour chaque log
+                    $this->hub->publish(new Update(
+                        'https://archadia.net/logs',
+                        json_encode([
+                            'character' => $character->getNom(),
+                            'amount' => null,
+                            'description' => $description,
+                            'isCritical' => true,
+                            'date' => date('H:i:s')
+                        ])
+                    ));
+                }
+
+                // Passer tout en discard
+                $allEdts = $this->entityManager->getRepository(EdgeRunnerDownTime::class)->findAll();
+                foreach ($allEdts as $edt) {
                     if ($edt->isDraft() || $edt->isSelected()) {
                         $edt->setDraft(false);
                         $edt->setSelected(false);

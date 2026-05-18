@@ -402,6 +402,11 @@
             eventSource.onmessage = event => {
                 const data = JSON.parse(event.data);
                 
+                if (data.type === 'downtime_validated') {
+                    window.location.reload();
+                    return;
+                }
+
                 const noLogs = document.getElementById('no-logs');
                 if (noLogs) {
                     noLogs.remove();

@@ -123,6 +123,17 @@ final class DownTimeController extends AbstractController
 
         if ($edt->isSelected()) {
             $edt->setSelected(false);
+            $description = "A retiré son downtime : " . $edt->getDowntime()->getTitle();
+            $this->createLog($entityManager, $hub, $character, $description);
+
+            // Notification pour le MJ
+            $hub->publish(new Update(
+                'https://archadia.net/logs',
+                json_encode([
+                    'type' => 'downtime_validated',
+                    'character' => $character->getNom()
+                ])
+            ));
         } else {
             // Vérification du budget de 24h
             $characterDowntimes = $entityManager->getRepository(EdgeRunnerDownTime::class)->findBy([
@@ -158,6 +169,40 @@ final class DownTimeController extends AbstractController
         $entityManager->flush();
 
         return $this->redirectToRoute('app_character_downtime');
+    }
+
+    #[Route('/character/downtime/list', name: 'app_character_downtime_list')]
+    public function list(EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        $character = $entityManager->getRepository(Edgerunner::class)->findOneBy(['player' => $user]);
+        if (!$character) {
+            return $this->redirectToRoute('app_main');
+        }
+
+        // On récupère tous les downtimes qui ne sont pas discardés
+        $edts = $entityManager->getRepository(EdgeRunnerDownTime::class)->findBy([
+            'edgerunner' => $character,
+            'discard' => false
+        ]);
+
+        // Regroupement par titre de downtime
+        $grouped = [];
+        foreach ($edts as $edt) {
+            $title = $edt->getDowntime()->getTitle();
+            if (!isset($grouped[$title])) {
+                $grouped[$title] = [
+                    'downtime' => $edt->getDowntime(),
+                    'count' => 0
+                ];
+            }
+            $grouped[$title]['count']++;
+        }
+
+        return $this->render('character/downtime_list.html.twig', [
+            'character' => $character,
+            'groupedDowntimes' => $grouped,
+        ]);
     }
 
     private function createLog(EntityManagerInterface $entityManager, HubInterface $hub, Edgerunner $character, string $description, ?int $amount = null, bool $isCritical = false): void

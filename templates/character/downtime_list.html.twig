@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Deck Downtime - {{ character.nom }}{% endblock %}
+
+{% block body %}
+<div class="flex flex-col gap-6 animate-fade-in pb-20">
+    <div class="flex items-center justify-between border-b border-app pb-4">
+        <h2 class="text-xl font-bold tracking-tighter text-accent uppercase">Quotidien</h2>
+        <a href="{{ path('app_main') }}" class="text-xs font-bold uppercase tracking-widest text-muted-app hover:text-accent transition-colors flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 gap-3">
+        {% for item in groupedDowntimes %}
+            <div class="relative border border-app bg-app-lighter p-3 rounded-xl shadow-[0_0_10px_rgba(0,0,0,0.2)]">
+                <div class="flex justify-between items-start gap-2">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-bold text-app leading-tight truncate">
+                            {% if item.count > 1 %}
+                                <span class="text-accent mr-1">x{{ item.count }}</span>
+                            {% endif %}
+                            {{ item.downtime.title }}
+                        </h3>
+                        <p class="text-[11px] text-app-light leading-snug line-clamp-1 italic mt-1">
+                            {{ item.downtime.description }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-12 border border-dashed border-app rounded-2xl">
+                <i class="fas fa-layer-group text-3xl text-muted-app/20 mb-3 block"></i>
+                <p class="text-muted-app text-xs uppercase tracking-widest">Le deck est vide</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .line-clamp-1 {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
