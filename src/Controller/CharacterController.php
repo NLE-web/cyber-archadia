@@ -234,7 +234,7 @@ final class CharacterController extends AbstractController
         }
         foreach ($character->getItems() as $item)
         {
-            if ($item->getItem()->getActions() != null and $item->getAmount() > 0)
+            if ($item->getItem()->getActions() != null)
             {
                 foreach ($item->getItem()->getActions() as $action)
                 {
