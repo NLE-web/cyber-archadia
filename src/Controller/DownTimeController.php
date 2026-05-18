@@ -34,8 +34,7 @@ final class DownTimeController extends AbstractController
         // 1. Récupérer les downtimes déjà en draft pour le personnage
         $draftDowntimes = $entityManager->getRepository(EdgeRunnerDownTime::class)->findBy([
             'edgerunner' => $character,
-            'draft' => true,
-            'discard' => false
+            'draft' => true
         ]);
         $needed = 10 - count($draftDowntimes);
         if (count($draftDowntimes) < 10) {
@@ -49,13 +48,15 @@ final class DownTimeController extends AbstractController
                 if (count($availableDowntimes) < 1) {
                     $toRecycle = $entityManager->getRepository(EdgeRunnerDownTime::class)->findBy([
                         'edgerunner' => $character,
-                        'draft' => true,
-                        'discard' => true
+                        'draft' => false,
+                        'discard' => true,
+                        'selected' => false
                     ]);
 
                     foreach ($toRecycle as $edt) {
                         $edt->setDraft(false);
                         $edt->setDiscard(false);
+                        $edt->setSelected(false);
                     }
                     $entityManager->flush();
 
@@ -63,23 +64,29 @@ final class DownTimeController extends AbstractController
                     $availableDowntimes = $entityManager->getRepository(EdgeRunnerDownTime::class)->findBy([
                         'edgerunner' => $character,
                         'draft' => false,
-                        'discard' => false
+                        'discard' => false,
+                        'selected' => false
                     ]);
                 }
                 shuffle($availableDowntimes);
                 $toAdd = $availableDowntimes[array_rand($availableDowntimes)];
                 $toAdd->setDraft(true);
+                $toAdd->setSelected(false);
                 $draftDowntimes[] = $toAdd;
                 $entityManager->flush();
             }
         }
 
-        // Tri : les "forced" en premier
+        // Tri : les "forced" en premier, puis par ID pour garder un ordre stable
         usort($draftDowntimes, function($a, $b) {
             $aForced = $a->getDowntime()->isForced();
             $bForced = $b->getDowntime()->isForced();
-            if ($aForced === $bForced) return 0;
-            return $aForced ? -1 : 1;
+            
+            if ($aForced !== $bForced) {
+                return $aForced ? -1 : 1;
+            }
+            
+            return $a->getId() <=> $b->getId();
         });
 
         return $this->render('character/downtime.html.twig', [
@@ -88,9 +95,9 @@ final class DownTimeController extends AbstractController
         ]);
     }
 
-    #[Route('/character/downtime/validate', name: 'app_character_downtime_validate', methods: ['POST'])]
-    public function validate(
-        Request $request,
+    #[Route('/character/downtime/toggle/{id}', name: 'app_character_downtime_toggle', methods: ['POST'])]
+    public function toggle(
+        int $id,
         EntityManagerInterface $entityManager,
         HubInterface $hub
     ): Response {
@@ -100,64 +107,55 @@ final class DownTimeController extends AbstractController
         }
 
         $character = $entityManager->getRepository(Edgerunner::class)->findOneBy(['player' => $user]);
-        $selectedIds = $request->request->all('downtimes');
+        if (!$character) {
+            return $this->redirectToRoute('app_main');
+        }
 
-        $characterDowntimes = $entityManager->getRepository(EdgeRunnerDownTime::class)->findBy([
-            'edgerunner' => $character
-        ]);
-
-        if (empty($selectedIds)) {
+        $edt = $entityManager->getRepository(EdgeRunnerDownTime::class)->find($id);
+        if (!$edt || $edt->getEdgerunner() !== $character) {
             return $this->redirectToRoute('app_character_downtime');
         }
 
-        $totalTime = 0;
-        $downtimesToValidate = [];
-
-        // On inclut TOUJOURS les downtimes forcés non encore validés
-        foreach ($characterDowntimes as $edt) {
-            if ($edt->getDowntime()->isForced() && !$edt->isDiscard()) {
-                $totalTime += $edt->getDowntime()->getTimeCost();
-                $downtimesToValidate[] = $edt;
-            }
-        }
-
-        foreach ($selectedIds as $id) {
-            $edgeRunnerDownTime = $entityManager->getRepository(EdgeRunnerDownTime::class)->find($id);
-            if ($edgeRunnerDownTime && $edgeRunnerDownTime->getEdgerunner() === $character) {
-                // Si c'est un forcé, il est déjà ajouté au-dessus
-                if ($edgeRunnerDownTime->getDowntime()->isForced()) {
-                    continue;
-                }
-                
-                if (!$edgeRunnerDownTime->isDiscard()) {
-                    $totalTime += $edgeRunnerDownTime->getDowntime()->getTimeCost();
-                    $downtimesToValidate[] = $edgeRunnerDownTime;
-                }
-            }
-        }
-
-        if ($totalTime > 24) {
-            $this->addFlash('error', 'Le coût total ne peut pas dépasser 24 heures.');
+        // On ne peut pas désélectionner un forcé
+        if ($edt->getDowntime()->isForced()) {
             return $this->redirectToRoute('app_character_downtime');
         }
 
-        foreach ($downtimesToValidate as $edt) {
-            $edt->setDiscard(true);
+        if ($edt->isSelected()) {
+            $edt->setSelected(false);
+        } else {
+            // Vérification du budget de 24h
+            $characterDowntimes = $entityManager->getRepository(EdgeRunnerDownTime::class)->findBy([
+                'edgerunner' => $character
+            ]);
+            
+            $totalTime = 0;
+            foreach ($characterDowntimes as $item) {
+                if ($item->isDraft() && ($item->isSelected() || $item->getDowntime()->isForced())) {
+                    $totalTime += $item->getDowntime()->getTimeCost();
+                }
+            }
 
-            $description = "A validé son downtime : " . $edt->getDowntime()->getTitle();
+            if ($totalTime + $edt->getDowntime()->getTimeCost() > 24) {
+                $this->addFlash('error', 'Le coût total ne peut pas dépasser 24 heures.');
+                return $this->redirectToRoute('app_character_downtime');
+            }
+
+            $edt->setSelected(true);
+            $description = "A sélectionné son downtime : " . $edt->getDowntime()->getTitle();
             $this->createLog($entityManager, $hub, $character, $description);
+
+            // Notification pour le MJ
+            $hub->publish(new Update(
+                'https://archadia.net/logs',
+                json_encode([
+                    'type' => 'downtime_validated',
+                    'character' => $character->getNom()
+                ])
+            ));
         }
 
         $entityManager->flush();
-
-        // Notification pour le MJ
-        $hub->publish(new Update(
-            'https://archadia.net/logs',
-            json_encode([
-                'type' => 'downtime_validated',
-                'character' => $character->getNom()
-            ])
-        ));
 
         return $this->redirectToRoute('app_character_downtime');
     }

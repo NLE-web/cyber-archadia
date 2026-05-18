@@ -24,6 +24,7 @@ class EdgeRunnerDownTimeCrudController extends AbstractCrudController
             AssociationField::new('downtime', 'Downtime'),
             TextareaField::new('effetBonus', 'Effet Bonus'),
             BooleanField::new('draft', 'draft'),
+            BooleanField::new('selected', 'selected'),
             BooleanField::new('discard', 'discard'),
         ];
     }

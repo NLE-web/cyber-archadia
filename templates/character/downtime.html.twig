@@ -3,10 +3,17 @@
 {% block title %}Downtime - {{ character.nom }}{% endblock %}
 
 {% block body %}
-<div class="flex flex-col gap-6 animate-fade-in pb-44">
+{% for message in app.flashes('error') %}
+    <div id="flash-error" class="fixed top-24 left-4 right-4 z-[100] bg-red-500 text-white px-6 py-4 rounded-2xl shadow-[0_0_20px_rgba(239,68,68,0.4)] border border-red-400/50 flex items-center gap-3 animate-slide-in">
+        <i class="fas fa-exclamation-triangle text-xl"></i>
+        <span class="font-bold">{{ message }}</span>
+    </div>
+{% endfor %}
+
+<div class="flex flex-col gap-6 animate-fade-in pb-20">
     {% set preselectedTime = 0 %}
     {% for edt in downtimes %}
-        {% if edt.discard %}
+        {% if edt.selected or edt.downtime.forced %}
             {% set preselectedTime = preselectedTime + edt.downtime.timeCost %}
         {% endif %}
     {% endfor %}
@@ -15,35 +22,31 @@
         <h2 class="text-2xl font-bold tracking-tighter text-accent">DOWNTIME</h2>
         <div class="flex flex-col items-end">
             <span class="text-xs font-bold uppercase tracking-widest text-muted-app">Temps accumulé</span>
-            <div id="total-time-display" class="text-xl font-black text-app">
+            <div id="total-time-display" class="text-xl font-black {{ preselectedTime > 24 ? 'text-red-500 animate-pulse' : 'text-app' }}">
                 <span id="total-hours">{{ preselectedTime }}</span> / 24H
             </div>
         </div>
     </div>
 
-    <form action="{{ path('app_character_downtime_validate') }}" method="POST">
-        <div class="space-y-4">
-            {% for edt in downtimes %}
-                {% set isForced = edt.downtime.forced %}
-                <div class="group border {{ isForced ? 'border-red-500/50 bg-red-500/5' : 'border-app bg-app-lighter' }} rounded-xl overflow-hidden transition-all duration-300 {{ edt.discard ? 'opacity-50 grayscale' : (isForced ? 'hover:border-red-500' : 'hover:border-accent') }}">
-                    <div class="p-4 flex items-start gap-3">
-                        {% if not edt.discard %}
-                            <div class="pt-1">
-                                <input type="checkbox" name="downtimes[]" value="{{ edt.id }}" 
-                                       data-cost="{{ edt.downtime.timeCost }}"
-                                       {{ isForced ? 'checked onclick="return false;"' : 'onchange="updateTotalTime()"' }}
-                                       class="downtime-checkbox w-5 h-5 rounded {{ isForced ? 'border-red-500 bg-red-900/20 text-red-500' : 'border-app bg-app text-accent focus:ring-accent' }}">
-                            </div>
-                        {% else %}
-                            <div class="pt-1">
-                                <i class="fas fa-check-circle text-green-500 text-xl"></i>
-                            </div>
-                        {% endif %}
+    <div class="space-y-4">
+        {% for edt in downtimes %}
+            {% set isForced = edt.downtime.forced %}
+            <div class="group relative border {{ isForced ? 'border-red-500/50 bg-red-500/5' : 'border-app bg-app-lighter' }} rounded-xl overflow-hidden transition-all duration-300 {{ edt.selected ? 'border-accent bg-accent/5 shadow-[0_0_15px_rgba(var(--accent-rgb),0.1)]' : (isForced ? 'hover:border-red-500' : 'hover:border-accent/50') }}">
+                
+                {# Bouton de sélection (Toute la tuile sauf le bouton info) #}
+                <form action="{{ path('app_character_downtime_toggle', {id: edt.id}) }}" method="POST" class="m-0 downtime-form">
+                    <button type="submit" class="w-full text-left p-4 flex items-start gap-3 {{ isForced ? 'cursor-default' : 'cursor-pointer' }}" {{ isForced ? 'onclick="return false;"' : '' }}>
+                        <div class="pt-1">
+                            {% if edt.selected or isForced %}
+                                <i class="fas {{ isForced ? 'fa-exclamation-triangle text-red-500' : 'fa-check-circle text-accent' }} text-xl"></i>
+                            {% else %}
+                                <div class="w-5 h-5 rounded border-2 border-app-light group-hover:border-accent/50 transition-colors"></div>
+                            {% endif %}
+                        </div>
 
-                        <div class="flex-1 min-w-0 cursor-pointer" onclick="toggleDowntime({{ edt.id }})">
+                        <div class="flex-1 min-w-0">
                             <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-lg font-bold {{ isForced ? 'text-red-500' : 'text-app' }} leading-tight truncate mr-2">
-                                    {{ isForced ? '<i class="fas fa-exclamation-triangle mr-1"></i>' : '' }}
+                                <h3 class="text-lg font-bold {{ isForced ? 'text-red-500' : (edt.selected ? 'text-accent' : 'text-app') }} leading-tight truncate mr-8">
                                     {{ edt.downtime.title }}
                                 </h3>
                                 <span class="text-xs font-bold {{ isForced ? 'text-red-500' : 'text-accent' }} uppercase tracking-widest shrink-0">
@@ -54,50 +57,45 @@
                                 {{ edt.downtime.description }}
                             </p>
                         </div>
-                    </div>
+                    </button>
+                </form>
 
-                    {# Contenu déployé (Effets) #}
-                    <div id="content-{{ edt.id }}" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out {{ isForced ? 'bg-red-500/10' : 'bg-black/20' }}">
-                        <div class="p-4 border-t {{ isForced ? 'border-red-500/20' : 'border-app/50' }} space-y-4">
-                            <div class="{{ isForced ? 'bg-red-500/10 border border-red-500/20' : 'bg-accent/10 border border-accent/20' }} p-3 rounded-lg">
-                                <span class="text-[10px] font-bold {{ isForced ? 'text-red-500' : 'text-accent' }} uppercase block mb-1">Effet</span>
-                                <div class="text-sm text-app">
-                                    {{ edt.downtime.effet|parse_description }}
-                                </div>
-                                {% if edt.effetBonus %}
-                                    <div class="mt-2 pt-2 border-t {{ isForced ? 'border-red-500/20' : 'border-accent/20' }}">
-                                        <span class="text-[10px] font-bold text-blue-400 uppercase block mb-1">Bonus MJ</span>
-                                        <div class="text-sm text-app font-semibold">
-                                            {{ edt.effetBonus }}
-                                        </div>
-                                    </div>
-                                {% endif %}
+                {# Bouton info séparé #}
+                <button onclick="toggleDowntime({{ edt.id }})" 
+                        class="absolute right-4 bottom-4 w-5 h-5 flex items-center justify-center rounded-full bg-app/50 text-app-light hover:bg-accent/20 hover:text-accent transition-all z-10 border border-app-light/20">
+                    <i class="fas fa-info text-xs"></i>
+                </button>
+
+                {# Contenu déployé (Effets) #}
+                <div id="content-{{ edt.id }}" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out {{ isForced ? 'bg-red-500/10' : 'bg-black/20' }}">
+                    <div class="p-4 border-t {{ isForced ? 'border-red-500/20' : 'border-app/50' }} space-y-4">
+                        <div class="{{ isForced ? 'bg-red-500/10 border border-red-500/20' : 'bg-accent/10 border border-accent/20' }} p-3 rounded-lg">
+                            <span class="text-[10px] font-bold {{ isForced ? 'text-red-500' : 'text-accent' }} uppercase block mb-1">Effet</span>
+                            <div class="text-sm text-app">
+                                {{ edt.downtime.effet|parse_description }}
                             </div>
+                            {% if edt.effetBonus %}
+                                <div class="mt-2 pt-2 border-t {{ isForced ? 'border-red-500/20' : 'border-accent/20' }}">
+                                    <span class="text-[10px] font-bold text-blue-400 uppercase block mb-1">Bonus MJ</span>
+                                    <div class="text-sm text-app font-semibold">
+                                        {{ edt.effetBonus }}
+                                    </div>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-            {% else %}
-                <div class="text-center py-12 border border-dashed border-app rounded-2xl">
-                    <i class="fas fa-couch text-4xl text-muted-app/20 mb-4 block"></i>
-                    <p class="text-muted-app text-sm">Aucune activité de downtime disponible pour le moment.</p>
-                </div>
-            {% endfor %}
-        </div>
-
-        {% if downtimes|length > 0 %}
-            <div class="fixed bottom-24 left-4 right-4 max-w-md mx-auto z-30">
-                <button type="submit" id="submit-btn" disabled
-                        class="w-full py-4 bg-accent text-white font-bold uppercase tracking-[0.2em] text-sm rounded-xl shadow-2xl transition-all duration-300 opacity-50 cursor-not-allowed">
-                    Valider la sélection (<span id="btn-hours">0</span>h)
-                </button>
             </div>
-        {% endif %}
-    </form>
+        {% else %}
+            <div class="text-center py-12 border border-dashed border-app rounded-2xl">
+                <i class="fas fa-couch text-4xl text-muted-app/20 mb-4 block"></i>
+                <p class="text-muted-app text-sm">Aucune activité de downtime disponible pour le moment.</p>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 
 <script>
-    const preselectedTime = {{ preselectedTime }};
-
     function toggleDowntime(id) {
         const content = document.getElementById('content-' + id);
         if (content.style.maxHeight && content.style.maxHeight !== '0px') {
@@ -107,71 +105,29 @@
         }
     }
 
-    function updateTotalTime() {
-        const checkboxes = document.querySelectorAll('.downtime-checkbox:checked');
-        let total = preselectedTime;
-        let newSelectedCount = 0;
-        
-        checkboxes.forEach(cb => {
-            // On ne compte dans le total JS que ce qui n'est PAS déjà dans le preselectedTime (discard = true)
-            // Mais attente, le preselectedTime est calculé sur edt.discard en Twig.
-            // Si une checkbox est "forced", elle est déjà cochée et a data-cost.
-            // On veut le total absolu pour la limite de 24h.
-            total += parseInt(cb.dataset.cost);
-            
-            // On compte comme "nouvelle sélection" seulement ce qui n'est pas "forced" et pas encore "discard"
-            // Les forced non-discard sont cochées par défaut mais doivent être validées
-            if (!cb.onclick) { // Simple check pour identifier mes checkboxes normales vs forced
-                 newSelectedCount++;
-            }
-        });
-
-        const totalDisplay = document.getElementById('total-hours');
-        const btnHours = document.getElementById('btn-hours');
-        const submitBtn = document.getElementById('submit-btn');
-        const displayContainer = document.getElementById('total-time-display');
-
-        totalDisplay.innerText = total;
-        
-        // Calcul du temps à valider (ce qui est coché et non discard)
-        let forcedToValidateCost = 0;
-        document.querySelectorAll('.downtime-checkbox[onclick]').forEach(cb => {
-            forcedToValidateCost += parseInt(cb.dataset.cost);
-        });
-        
-        let normalToValidateCost = 0;
-        document.querySelectorAll('.downtime-checkbox:not([onclick]):checked').forEach(cb => {
-            normalToValidateCost += parseInt(cb.dataset.cost);
-        });
-
-        btnHours.innerText = forcedToValidateCost + normalToValidateCost;
-
-        if (total > 24) {
-            displayContainer.classList.remove('text-app');
-            displayContainer.classList.add('text-red-500', 'animate-pulse');
-            submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            submitBtn.classList.remove('opacity-100');
-        } else {
-            displayContainer.classList.add('text-app');
-            displayContainer.classList.remove('text-red-500', 'animate-pulse');
-            
-            // Le bouton est actif s'il y a quelque chose à valider (normal ou forcé)
-            if ((forcedToValidateCost + normalToValidateCost) > 0) {
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                submitBtn.classList.add('opacity-100');
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                submitBtn.classList.remove('opacity-100');
-            }
-        }
-    }
-
-    // Initialisation au cas où
     document.addEventListener('DOMContentLoaded', () => {
-        updateTotalTime();
+        // Gestion des notifications flash
+        const flash = document.getElementById('flash-error');
+        if (flash) {
+            setTimeout(() => {
+                flash.classList.add('animate-slide-out');
+                setTimeout(() => flash.remove(), 500);
+            }, 3000);
+        }
+
+        // Gestion du maintien du scroll
+        const scrollKey = 'downtime_scroll_pos';
+        const savedScroll = localStorage.getItem(scrollKey);
+        if (savedScroll) {
+            window.scrollTo(0, parseInt(savedScroll));
+            localStorage.removeItem(scrollKey);
+        }
+
+        document.querySelectorAll('.downtime-form').forEach(form => {
+            form.addEventListener('submit', () => {
+                localStorage.setItem(scrollKey, window.scrollY);
+            });
+        });
     });
 </script>
 
@@ -182,6 +138,20 @@
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide-in {
+        animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide-out {
+        animation: slideOut 0.4s ease-in forwards;
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-20px); }
     }
     .line-clamp-2 {
         display: -webkit-box;

@@ -73,7 +73,7 @@ class DashboardController extends AbstractDashboardController
         $characters = $this->entityManager->getRepository(Edgerunner::class)->findAll();
         $contacts = $this->entityManager->getRepository(Contact::class)->findAll();
         $conversations = $this->entityManager->getRepository(CharacterContact::class)->findAll();
-        $discardedDowntimes = $this->entityManager->getRepository(EdgeRunnerDownTime::class)->findBy(['discard' => true]);
+        $discardedDowntimes = $this->entityManager->getRepository(EdgeRunnerDownTime::class)->findBy(['selected' => true]);
         
         $conversationId = $request->query->get('conversation_id');
         $activeConversation = null;
@@ -172,7 +172,9 @@ class DashboardController extends AbstractDashboardController
             if (!$newState) {
                 $edts = $this->entityManager->getRepository(EdgeRunnerDownTime::class)->findAll();
                 foreach ($edts as $edt) {
-                    if ($edt->isDraft()) {
+                    if ($edt->isDraft() || $edt->isSelected()) {
+                        $edt->setDraft(false);
+                        $edt->setSelected(false);
                         $edt->setDiscard(true);
                     }
                 }

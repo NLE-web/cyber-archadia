@@ -31,6 +31,9 @@ class EdgeRunnerDownTime
     #[ORM\Column]
     private bool $discard = false;
 
+    #[ORM\Column(options: ["default" => false])]
+    private bool $selected = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -92,6 +95,18 @@ class EdgeRunnerDownTime
     public function setDiscard(bool $discard): static
     {
         $this->discard = $discard;
+
+        return $this;
+    }
+
+    public function isSelected(): bool
+    {
+        return $this->selected;
+    }
+
+    public function setSelected(bool $selected): static
+    {
+        $this->selected = $selected;
 
         return $this;
     }
