@@ -287,6 +287,25 @@ final class CharacterController extends AbstractController
                 }
             }
         }
+
+        // Global Core Actions
+        $coreActions = $manager->getRepository(Action::class)->findBy(['type' => 'Core']);
+        foreach ($coreActions as $action) {
+            $type = $action->getType();
+            $actionId = $action->getId();
+
+            if (!isset($actionsArray[$type])) {
+                $actionsArray[$type] = [];
+            }
+
+            if (!isset($actionsArray[$type][$actionId])) {
+                $actionsArray[$type][$actionId] = [
+                    'object' => $action,
+                    'amount' => null,
+                    'characterItemId' => null
+                ];
+            }
+        }
         return $this->render('main/actions.html.twig', [
             "character" => $character,
             "actions" => $actionsArray,
