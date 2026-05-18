@@ -96,6 +96,12 @@ class Edgerunner
     #[ORM\OneToMany(targetEntity: CharacterContact::class, mappedBy: 'character', orphanRemoval: true)]
     private Collection $characterContacts;
 
+    /**
+     * @var Collection<int, EdgeRunnerDownTime>
+     */
+    #[ORM\OneToMany(targetEntity: EdgeRunnerDownTime::class, mappedBy: 'edgerunner', orphanRemoval: true)]
+    private Collection $edgeRunnerDownTimes;
+
     public function __construct()
     {
         $this->skills = new ArrayCollection();
@@ -104,6 +110,7 @@ class Edgerunner
         $this->feats = new ArrayCollection();
         $this->stuffs = new ArrayCollection();
         $this->characterContacts = new ArrayCollection();
+        $this->edgeRunnerDownTimes = new ArrayCollection();
     }
     public function getHumanityLoss(): ?int
     {
@@ -469,6 +476,36 @@ class Edgerunner
             // set the owning side to null (unless already changed)
             if ($characterContact->getCharacter() === $this) {
                 $characterContact->setCharacter(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EdgeRunnerDownTime>
+     */
+    public function getEdgeRunnerDownTimes(): Collection
+    {
+        return $this->edgeRunnerDownTimes;
+    }
+
+    public function addEdgeRunnerDownTime(EdgeRunnerDownTime $edgeRunnerDownTime): static
+    {
+        if (!$this->edgeRunnerDownTimes->contains($edgeRunnerDownTime)) {
+            $this->edgeRunnerDownTimes->add($edgeRunnerDownTime);
+            $edgeRunnerDownTime->setEdgerunner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEdgeRunnerDownTime(EdgeRunnerDownTime $edgeRunnerDownTime): static
+    {
+        if ($this->edgeRunnerDownTimes->removeElement($edgeRunnerDownTime)) {
+            // set the owning side to null (unless already changed)
+            if ($edgeRunnerDownTime->getEdgerunner() === $this) {
+                $edgeRunnerDownTime->setEdgerunner(null);
             }
         }
 

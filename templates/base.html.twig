@@ -61,6 +61,24 @@
                             </a>
                         </div>
                     {% endif %}
+
+                    {% if is_granted('ROLE_USER') and app.user.downtimeActive %}
+                        <div id="downtime-banner" class="w-full bg-blue-600 text-white py-2 text-center overflow-hidden transition-all duration-500 h-auto opacity-100">
+                            <a href="{{ path('app_character_downtime') }}" class="relative z-30 flex items-center justify-center gap-2 animate-pulse">
+                                <i class="fas fa-clock"></i>
+                                <span class="text-xs font-bold uppercase tracking-[0.2em]">DOWNTIME ACTIF !</span>
+                                <i class="fas fa-clock"></i>
+                            </a>
+                        </div>
+                    {% elseif is_granted('ROLE_USER') %}
+                        <div id="downtime-banner" class="w-full bg-blue-600 text-white text-center overflow-hidden transition-all duration-500 h-0 opacity-0 pointer-events-none">
+                            <a href="{{ path('app_character_downtime') }}" class="relative z-30 flex items-center justify-center gap-2 animate-pulse">
+                                <i class="fas fa-clock"></i>
+                                <span class="text-xs font-bold uppercase tracking-[0.2em]">DOWNTIME ACTIF !</span>
+                                <i class="fas fa-clock"></i>
+                            </a>
+                        </div>
+                    {% endif %}
                 </header>
 
                 <main class="flex-1 overflow-y-auto pb-24" id="main-container">
@@ -79,6 +97,10 @@
                             const eventSource = new EventSource(`${mercureUrl}?topic=${topic}`);
                             const banner = document.getElementById('levelup-banner');
 
+                            const topicDowntime = encodeURIComponent('https://archadia.net/downtime');
+                            const eventSourceDowntime = new EventSource(`${mercureUrl}?topic=${topicDowntime}`);
+                            const bannerDowntime = document.getElementById('downtime-banner');
+
                             eventSource.onmessage = event => {
                                 const data = JSON.parse(event.data);
                                 if (data.active) {
@@ -87,6 +109,17 @@
                                 } else {
                                     banner.classList.add('h-0', 'opacity-0', 'pointer-events-none');
                                     banner.classList.remove('h-auto', 'opacity-100', 'py-2');
+                                }
+                            };
+
+                            eventSourceDowntime.onmessage = event => {
+                                const data = JSON.parse(event.data);
+                                if (data.active) {
+                                    bannerDowntime.classList.remove('h-0', 'opacity-0', 'pointer-events-none');
+                                    bannerDowntime.classList.add('h-auto', 'opacity-100', 'py-2');
+                                } else {
+                                    bannerDowntime.classList.add('h-0', 'opacity-0', 'pointer-events-none');
+                                    bannerDowntime.classList.remove('h-auto', 'opacity-100', 'py-2');
                                 }
                             };
                         });

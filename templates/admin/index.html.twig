@@ -146,6 +146,16 @@
                 <div class="card-body">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
                         <div>
+                            <h6 class="mb-1">Mode Downtime</h6>
+                            <p class="text-muted small mb-0">Active l'interface de passe-temps pour les joueurs.</p>
+                        </div>
+                        <a href="{{ path('admin_downtime_toggle') }}" class="btn {{ downtimeActive ? 'btn-danger' : 'btn-success' }}">
+                            {{ downtimeActive ? 'Désactiver le Downtime' : 'Activer le Downtime' }}
+                        </a>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
+                        <div>
                             <h6 class="mb-1">Mode Level Up</h6>
                             <p class="text-muted small mb-0">Active le bandeau Level Up et les options de progression pour les joueurs.</p>
                         </div>
@@ -176,6 +186,46 @@
                                 <i class="fa fa-plus mr-1"></i> Donner XP
                             </button>
                         </form>
+                    </div>
+                </div>
+            </div>
+
+            {# Section Downtimes validés #}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0" style="margin:0; font-weight: bold; letter-spacing: 1px;">DOWNTIMES VALIDÉS</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div style="overflow-x: auto;">
+                        <table class="table table-hover mb-0">
+                            <thead style="background-color: #f8f9fa;">
+                                <tr>
+                                    <th>Edgerunner</th>
+                                    <th>Activité</th>
+                                    <th>Effet (+ Bonus)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for edt in discardedDowntimes %}
+                                    <tr>
+                                        <td><strong>{{ edt.edgerunner.nom }}</strong></td>
+                                        <td>{{ edt.downtime.title }}</td>
+                                        <td>
+                                            <div class="small">
+                                                {{ edt.downtime.effet|parse_description }}
+                                                {% if edt.effetBonus %}
+                                                    <br><span class="text-primary font-weight-bold">Bonus:</span> {{ edt.effetBonus }}
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">Aucun downtime validé pour le moment.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

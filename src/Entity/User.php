@@ -48,6 +48,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(options: ["default" => false])]
     private ?bool $levelUpActive = false;
 
+    #[ORM\Column(options: ["default" => false])]
+    private bool $downtimeActive = false;
+
     public function __construct()
     {
         $this->edgerunners = new ArrayCollection();
@@ -191,6 +194,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLevelUpActive(bool $levelUpActive): static
     {
         $this->levelUpActive = $levelUpActive;
+
+        return $this;
+    }
+
+    public function isDowntimeActive(): bool
+    {
+        return $this->downtimeActive;
+    }
+
+    public function setDowntimeActive(bool $downtimeActive): static
+    {
+        $this->downtimeActive = $downtimeActive;
 
         return $this;
     }

@@ -20,6 +20,8 @@ use App\Entity\Log;
 use App\Entity\Message;
 use App\Entity\Skill;
 use App\Entity\User;
+use App\Entity\EdgeRunnerDownTime;
+use App\Entity\DownTime;
 use App\Repository\CharacterContactRepository;
 use App\Repository\ContactRepository;
 use App\Repository\EdgerunnerRepository;
@@ -58,17 +60,20 @@ class DashboardController extends AbstractDashboardController
         
         $mercureUrl = $_ENV['MERCURE_PUBLIC_URL'] ?? 'https://example.com/.well-known/mercure';
 
-        // Check global level up state
+        // Check global state
         $levelUpActive = false;
+        $downtimeActive = false;
         $users = $this->userRepository->findAll();
         if (count($users) > 0) {
             $levelUpActive = $users[0]->isLevelUpActive();
+            $downtimeActive = $users[0]->isDowntimeActive();
         }
 
         $items = $this->itemRepository->findAll();
         $characters = $this->entityManager->getRepository(Edgerunner::class)->findAll();
         $contacts = $this->entityManager->getRepository(Contact::class)->findAll();
         $conversations = $this->entityManager->getRepository(CharacterContact::class)->findAll();
+        $discardedDowntimes = $this->entityManager->getRepository(EdgeRunnerDownTime::class)->findBy(['discard' => true]);
         
         $conversationId = $request->query->get('conversation_id');
         $activeConversation = null;
@@ -91,6 +96,8 @@ class DashboardController extends AbstractDashboardController
             'mercure_url' => $mercureUrl . '?topic=' . rawurlencode('https://archadia.net/logs'),
             'mercure_social_url' => $mercureUrl . '?topic=' . rawurlencode('https://archadia.net/social/admin'),
             'levelUpActive' => $levelUpActive,
+            'downtimeActive' => $downtimeActive,
+            'discardedDowntimes' => $discardedDowntimes,
             'items' => $items,
             'characters' => $characters,
             'contacts' => $contacts,
@@ -119,6 +126,10 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(SkillCrudController::class, 'Skills', 'fa fa-brain')->setAction('index');
         yield MenuItem::linkTo(FeatCrudController::class, 'Feats', 'fa fa-award')->setAction('index');
         yield MenuItem::linkTo(ImageFileCrudController::class, 'Images', 'fa fa-image')->setAction('index');
+
+        yield MenuItem::section('Downtime');
+        yield MenuItem::linkTo(DownTimeCrudController::class, 'Liste des Downtimes', 'fa fa-clock')->setAction('index');
+        yield MenuItem::linkTo(EdgeRunnerDownTimeCrudController::class, 'Assignations Joueurs', 'fa fa-link')->setAction('index');
     }
 
     #[Route('/admin/xp/give', name: 'admin_xp_give', methods: ['POST'])]
@@ -142,6 +153,29 @@ class DashboardController extends AbstractDashboardController
         }
 
         $this->entityManager->flush();
+        return $this->redirectToRoute('admin');
+    }
+
+    #[Route('/admin/downtime/toggle', name: 'admin_downtime_toggle', methods: ['GET'])]
+    public function toggleDowntime(HubInterface $hub): Response
+    {
+        $users = $this->userRepository->findAll();
+        $newState = true;
+
+        if (count($users) > 0) {
+            $newState = !$users[0]->isDowntimeActive();
+            foreach ($users as $user) {
+                $user->setDowntimeActive($newState);
+            }
+            $this->entityManager->flush();
+        }
+
+        // Notify via Mercure
+        $hub->publish(new Update(
+            'https://archadia.net/downtime',
+            json_encode(['active' => $newState])
+        ));
+
         return $this->redirectToRoute('admin');
     }
 
