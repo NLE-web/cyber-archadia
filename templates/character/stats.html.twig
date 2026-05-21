@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+{% import "_macros.html.twig" as macros %}
+
+{% block title %}Statistiques - {{ character.nom }}{% endblock %}
+
+{% block body %}
+<div class="flex flex-col gap-6 animate-fade-in pb-20">
+    <div class="flex items-center justify-between border-b border-app pb-4">
+        <h2 class="text-xl font-bold tracking-tighter text-accent uppercase">Statistiques</h2>
+        <a href="{{ path('app_main') }}" class="text-xs font-bold uppercase tracking-widest text-muted-app hover:text-accent transition-colors flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+        {# XP TOTAL #}
+        <div class="card card--neon p-4">
+            <div class="text-xs uppercase tracking-[0.24em] text-muted mb-2">XP Total dépensé</div>
+            <div class="text-3xl font-bold text-accent text-neon">
+                {{ character.totalXpSpent|default(0) }}
+            </div>
+            <p class="text-[10px] text-muted mt-2 italic">Cumul de l'expérience investie dans les compétences et talents.</p>
+        </div>
+
+        {# ARGENT TOTAL #}
+        <div class="card card--neon p-4">
+            <div class="text-xs uppercase tracking-[0.24em] text-muted mb-2">Argent Total dépensé</div>
+            <div class="flex items-center gap-2">
+                <div class="text-3xl font-bold text-accent text-neon">
+                    {{ character.totalMoneySpent|number_format(0, '.', ' ') }}
+                </div>
+                <div class="text-accent">
+                    {{ macros.dragon('w-6 h-6') }}
+                </div>
+            </div>
+            <p class="text-[10px] text-muted mt-2 italic">Cumul de l'argent dépensé ou retiré manuellement du solde.</p>
+        </div>
+
+        {# SANTÉ MENTALE #}
+        <div class="card card--neon p-4">
+            <div class="text-xs uppercase tracking-[0.24em] text-muted mb-2">Santé mentale</div>
+            <div class="text-3xl font-bold text-accent text-neon">
+                {{ (character.humanityLoss / 5)|number_format(0) }} %
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

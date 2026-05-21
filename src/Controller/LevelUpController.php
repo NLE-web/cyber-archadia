@@ -94,6 +94,7 @@ final class LevelUpController extends AbstractController
         if ($type === 'skill') {
             $cs = $entityManager->getRepository(CharacterSkill::class)->find($id);
             if ($cs && $cs->getCharacter() === $character && $cs->getLevel() < 5) {
+                $character->setTotalXpSpent($character->getTotalXpSpent() + 1);
                 $newXp = $cs->getXptot() + 1;
                 $xpCost = $cs->getSkill()->getXpcost() ?? 10; // Valeur par défaut si non définie
 
@@ -111,6 +112,7 @@ final class LevelUpController extends AbstractController
             if ($cf && $cf->getCharacter() === $character) {
                 $xpCost = $cf->getFeat()->getXpcost() ?? 10;
                 if ($cf->getXptot() < $xpCost) {
+                    $character->setTotalXpSpent($character->getTotalXpSpent() + 1);
                     $cf->setXptot($cf->getXptot() + 1);
                     $this->createLog($manager, $hub, $character, "+1 XP sur " . $cf->getFeat()->getName());
                     

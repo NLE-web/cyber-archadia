@@ -82,6 +82,12 @@ class Edgerunner
     private ?int $xp = 10;
 
     #[ORM\Column(options: ["default" => 0])]
+    private ?int $totalXpSpent = 0;
+
+    #[ORM\Column(options: ["default" => 0])]
+    private ?int $totalMoneySpent = 0;
+
+    #[ORM\Column(options: ["default" => 0])]
     private ?int $humanityLoss = 0;
 
     /**
@@ -122,6 +128,11 @@ class Edgerunner
         $this->humanityLoss = $humanityLoss;
 
         return $this;
+    }
+
+    public function getHumanity(): int
+    {
+        return 100 - ($this->humanityLoss ?? 0);
     }
 
     public function getId(): ?int
@@ -418,6 +429,30 @@ class Edgerunner
     public function setXp(int $xp): static
     {
         $this->xp = $xp;
+
+        return $this;
+    }
+
+    public function getTotalXpSpent(): ?int
+    {
+        return $this->totalXpSpent;
+    }
+
+    public function setTotalXpSpent(int $totalXpSpent): static
+    {
+        $this->totalXpSpent = $totalXpSpent;
+
+        return $this;
+    }
+
+    public function getTotalMoneySpent(): ?int
+    {
+        return $this->totalMoneySpent;
+    }
+
+    public function setTotalMoneySpent(int $totalMoneySpent): static
+    {
+        $this->totalMoneySpent = $totalMoneySpent;
 
         return $this;
     }

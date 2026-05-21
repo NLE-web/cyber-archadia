@@ -148,6 +148,7 @@ final class CharacterController extends AbstractController
             } else {
                 $finalValue = -$value;
                 $character->setMoney(max(0, $character->getMoney() - $value));
+                $character->setTotalMoneySpent($character->getTotalMoneySpent() + $value);
                 $desc = "Retrait manuel";
             }
 
@@ -155,6 +156,19 @@ final class CharacterController extends AbstractController
         }
         $manager->getManager()->flush();
         return $this->redirectToRoute("app_main");
+    }
+
+    #[Route('/character/stats', name: 'app_character_stats')]
+    public function stats(ManagerRegistry $manager): Response
+    {
+        $character = $manager->getRepository(Edgerunner::class)->findOneBy(['player' => $this->getUser()]);
+        if (!$character) {
+            return $this->redirectToRoute("app_character_new");
+        }
+
+        return $this->render('character/stats.html.twig', [
+            'character' => $character,
+        ]);
     }
 
     #[Route('/character/skills', name: 'app_character_skills')]
