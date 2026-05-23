@@ -184,6 +184,12 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
+                    {% if item.isAmmo and (item.chargePrice ?? 0) > 0 %}
+                        <a href="{{ path('app_character_item_recharge', {id: ci.id}) }}" class="rounded bg-accent/10 px-2 py-0.5 text-[8px] font-black uppercase text-accent border border-accent/20 hover:bg-accent/20 inline-flex items-center gap-1">
+                            <i class="fas fa-battery-half"></i>
+                            Recharge ({{ item.chargePrice }}¢)
+                        </a>
+                    {% endif %}
                     {% if item.type == constant('App\\Entity\\Item::TYPE_CYBERWARE') %}
                         <a href="{{ path('app_character_item_install', {id: ci.id}) }}" class="rounded bg-ok/10 px-2 py-0.5 text-[8px] font-black uppercase text-ok border border-ok/20 hover:bg-ok/20">Installer</a>
                     {% elseif item.type == constant('App\\Entity\\Item::TYPE_EQUIPEMENT') %}
@@ -218,6 +224,12 @@
                                     <span class="text-[10px] font-bold uppercase tracking-wider text-muted">
                                         <i class="fas fa-circle mr-1"></i>Installer
                                     </span>
+                                {% endif %}
+                                {% if item.isAmmo and (item.chargePrice ?? 0) > 0 %}
+                                    <a href="{{ path('app_character_item_recharge', {id: ci.id}) }}" class="text-[10px] font-bold uppercase tracking-wider text-accent inline-flex items-center gap-1">
+                                        <i class="fas fa-battery-half"></i>
+                                        Recharge ({{ item.chargePrice }}¢)
+                                    </a>
                                 {% endif %}
                             </div>
                         </div>

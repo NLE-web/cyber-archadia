@@ -19,9 +19,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    public function __construct(
-        private readonly UserPasswordHasherInterface $passwordHasher,
-    ) {
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
     }
 
     public function load(ObjectManager $manager): void
@@ -67,6 +69,9 @@ class AppFixtures extends Fixture
         $edgerunner->setMoney(15000);
         $edgerunner->setXp(50);
         $edgerunner->setHumanityLoss(14);
+        // Nouveaux champs cumulés pour correspondre au schéma actuel
+        $edgerunner->setTotalXpSpent(0);
+        $edgerunner->setTotalMoneySpent(0);
 
         $eyes = new Item();
         $eyes->setName('Yeux Kiroshi Mk.3');
@@ -212,6 +217,21 @@ class AppFixtures extends Fixture
         $ammo->setDescription('Boîte de munitions standard');
         $ammo->setIsLegal(true);
         $ammo->setIsCumbersome(false);
+        // Adaptation au nouveau schéma: marquer comme munitions
+        $ammo->setIsAmmo(true);
+
+        // Autre type de munitions pour varier le jeu de données
+        $rifleAmmo = new Item();
+        $rifleAmmo->setName('Chargeurs 5.56');
+        $rifleAmmo->setType(Item::TYPE_CONSOMMABLE);
+        $rifleAmmo->setIllustration($itemIllustration);
+        $rifleAmmo->setIsConsume(true);
+        $rifleAmmo->setPrice(60);
+        $rifleAmmo->setChargePrice(60);
+        $rifleAmmo->setDescription('Munitions 5.56mm pour fusils d’assaut');
+        $rifleAmmo->setIsLegal(true);
+        $rifleAmmo->setIsCumbersome(false);
+        $rifleAmmo->setIsAmmo(true);
 
         $lockpick = new Item();
         $lockpick->setName('Kit de crochetage');
@@ -272,7 +292,13 @@ class AppFixtures extends Fixture
         $characterAmmo = new CharacterItem();
         $characterAmmo->setCharacter($edgerunner);
         $characterAmmo->setItem($ammo);
-        $characterAmmo->setAmount(3);
+        // Met volontairement à 0 pour valider l’affichage et la recharge des munitions à zéro
+        $characterAmmo->setAmount(0);
+
+        $characterRifleAmmo = new CharacterItem();
+        $characterRifleAmmo->setCharacter($edgerunner);
+        $characterRifleAmmo->setItem($rifleAmmo);
+        $characterRifleAmmo->setAmount(5);
 
         $characterLockpick = new CharacterItem();
         $characterLockpick->setCharacter($edgerunner);
@@ -309,6 +335,7 @@ class AppFixtures extends Fixture
         $edgerunner->addItem($characterCyberdeck);
         $edgerunner->addItem($characterKatana);
         $edgerunner->addItem($characterVest);
+        $edgerunner->addItem($characterRifleAmmo);
 
         /*
          * ACTIONS
@@ -350,6 +377,16 @@ class AppFixtures extends Fixture
         $couvert->setUsage(Action::USAGE_RAPIDE);
         $couvert->setCout(0);
         $manager->persist($couvert);
+
+        // Action de base globale (Core) visible pour tous
+        $observer = new Action();
+        $observer->setName('Observer');
+        $observer->setType('Core');
+        $observer->setItem(null);
+        $observer->setDescription('Analyser rapidement la situation.');
+        $observer->setUsage(Action::USAGE_RAPIDE);
+        $observer->setCout(0);
+        $manager->persist($observer);
 
         $lancerGrenade = new Action();
         $lancerGrenade->setName('Lancer grenade');
@@ -449,12 +486,14 @@ class AppFixtures extends Fixture
         $manager->persist($grenade);
         $manager->persist($medkit);
         $manager->persist($ammo);
+        $manager->persist($rifleAmmo);
         $manager->persist($lockpick);
         $manager->persist($stim);
 
         $manager->persist($characterGrenade);
         $manager->persist($characterMedkit);
         $manager->persist($characterAmmo);
+        $manager->persist($characterRifleAmmo);
         $manager->persist($characterLockpick);
         $manager->persist($characterStim);
 

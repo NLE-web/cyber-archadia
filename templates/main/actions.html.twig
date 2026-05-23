@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-
+{% import "_macros.html.twig" as macros %}
 {% block title %}Actions{% endblock %}
 
 {% block body %}
@@ -56,12 +56,46 @@
                                                         {{ action.name }}
                                                     </div>
 
+                                                    {# Origin: Feat or Item type with icon #}
+                                                    {% if actionData.originType is defined and actionData.originType %}
+                                                        <div class="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-muted flex items-center gap-1.5">
+                                                            {% if actionData.originType == 'feat' %}
+                                                                <i class="fas fa-bolt text-accent"></i>
+                                                                <span>Feat · {{ actionData.originName|default('') }}</span>
+                                                            {% elseif actionData.originType == 'item' %}
+                                                                {% set itype = actionData.originItemType|default(null) %}
+                                                                {% if itype == constant('App\\Entity\\Item::TYPE_CYBERWARE') %}
+                                                                    <i class="fas fa-microchip text-neon"></i>
+                                                                    <span>Cyberware · {{ actionData.originName|default('') }}</span>
+                                                                {% elseif itype == constant('App\\Entity\\Item::TYPE_EQUIPEMENT') %}
+                                                                    <i class="fas fa-toolbox text-app"></i>
+                                                                    <span>Équipement · {{ actionData.originName|default('') }}</span>
+                                                                {% elseif itype == constant('App\\Entity\\Item::TYPE_CONSOMMABLE') %}
+                                                                    <i class="fas fa-flask text-accent"></i>
+                                                                    <span>Consommable · {{ actionData.originName|default('') }}</span>
+                                                                {% else %}
+                                                                    <i class="fas fa-box"></i>
+                                                                    <span>{{ actionData.originName|default('') }}</span>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+
                                                     {% if action.item %}
                                                         <div class="mt-1 text-[10px] uppercase tracking-[0.14em] text-accent text-neon">
                                                             {% if actionData.amount is not null %}
-                                                                 ({{ actionData.amount }} {{ action.item.name }}  restants)
+                                                                 {{ actionData.amount }} restants
                                                             {% endif %}
                                                         </div>
+                                                        {% if action.item.isAmmo and (action.item.chargePrice ?? 0) > 0 and actionData.characterItemId %}
+                                                            <div class="mt-1">
+                                                                <a href="{{ path('app_character_item_recharge', {id: actionData.characterItemId}) }}"
+                                                                   class="inline-flex items-center gap-1.5 rounded-lg border border-accent/30 bg-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent hover:bg-accent/20 active:scale-95">
+                                                                    <i class="fas fa-add"></i>
+                                                                    {{ action.item.chargePrice }}{{ macros.dragon('w-3 h-3') }}
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
                                                     {% endif %}
 
                                                     <div class="mt-1 flex items-center gap-2">
@@ -84,15 +118,24 @@
                                                 </div>
 
                                                 <div class="flex flex-col gap-1">
-                                                    {% if action.maxUse and action.uses > 0 %}
-                                                        <a href="{{ path('app_character_action_decrement', {'id': action.id, 'type': 'action'}) }}" 
+                                                    {% set isAmmoAction = action.item and action.item.isAmmo %}
+                                                    {# Priorité: pour les munitions, on décrémente la quantité d'item (ammo) même si l'action a aussi des usages #}
+                                                    {% if isAmmoAction and actionData.characterItemId and actionData.amount > 0 %}
+                                                        <a href="{{ path('app_character_action_decrement', {'id': actionData.characterItemId, 'type': 'item'}) }}"
+                                                           class="flex h-8 w-8 items-center justify-center rounded-lg border border-accent/30 bg-accent/5 text-accent transition-all hover:bg-accent/20 active:scale-95">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                                                            </svg>
+                                                        </a>
+                                                    {% elseif action.maxUse and action.uses > 0 %}
+                                                        <a href="{{ path('app_character_action_decrement', {'id': action.id, 'type': 'action'}) }}"
                                                            class="flex h-8 w-8 items-center justify-center rounded-lg border border-app/30 bg-app/5 text-app transition-all hover:bg-app/20 active:scale-95">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                                                             </svg>
                                                         </a>
                                                     {% elseif actionData.characterItemId and actionData.amount > 0 %}
-                                                        <a href="{{ path('app_character_action_decrement', {'id': actionData.characterItemId, 'type': 'item'}) }}" 
+                                                        <a href="{{ path('app_character_action_decrement', {'id': actionData.characterItemId, 'type': 'item'}) }}"
                                                            class="flex h-8 w-8 items-center justify-center rounded-lg border border-accent/30 bg-accent/5 text-accent transition-all hover:bg-accent/20 active:scale-95">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
