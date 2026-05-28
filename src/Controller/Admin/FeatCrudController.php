@@ -23,6 +23,7 @@ class FeatCrudController extends AbstractCrudController
             TextField::new('name', 'Nom'),
             TextEditorField::new('description', 'Description'),
             AssociationField::new('actions', 'Actions liées'),
+            AssociationField::new('keywords', 'Mots-clés'),
         ];
     }
 }

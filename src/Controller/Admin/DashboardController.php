@@ -8,6 +8,7 @@ use App\Controller\Admin\EdgerunnerCrudController;
 use App\Controller\Admin\FeatCrudController;
 use App\Controller\Admin\ImageFileCrudController;
 use App\Controller\Admin\ItemCrudController;
+use App\Controller\Admin\KeywordCrudController;
 use App\Controller\Admin\SkillCrudController;
 use App\Entity\Action as ActionEntity;
 use App\Entity\CharacterContact;
@@ -133,6 +134,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(ActionCrudController::class, 'Actions', 'fa fa-bolt')->setAction('index');
         yield MenuItem::linkTo(SkillCrudController::class, 'Skills', 'fa fa-brain')->setAction('index');
         yield MenuItem::linkTo(FeatCrudController::class, 'Feats', 'fa fa-award')->setAction('index');
+        yield MenuItem::linkTo(KeywordCrudController::class, 'Keywords', 'fa fa-key')->setAction('index');
         yield MenuItem::linkTo(ImageFileCrudController::class, 'Images', 'fa fa-image')->setAction('index');
 
         yield MenuItem::section('Downtime');

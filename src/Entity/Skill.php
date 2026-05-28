@@ -30,9 +30,16 @@ class Skill
     #[ORM\Column(nullable: true)]
     private ?int $xpcost = null;
 
+    /**
+     * @var Collection<int, Keyword>
+     */
+    #[ORM\ManyToMany(targetEntity: Keyword::class, mappedBy: 'skills')]
+    private Collection $keywords;
+
     public function __construct()
     {
         $this->characterSkills = new ArrayCollection();
+        $this->keywords = new ArrayCollection();
     }
 
     public function getXpcost(): ?int
@@ -79,5 +86,32 @@ class Skill
     public function __toString(): string
     {
         return $this->name ?? 'Compétence';
+    }
+
+    /**
+     * @return Collection<int, Keyword>
+     */
+    public function getKeywords(): Collection
+    {
+        return $this->keywords;
+    }
+
+    public function addKeyword(Keyword $keyword): static
+    {
+        if (!$this->keywords->contains($keyword)) {
+            $this->keywords->add($keyword);
+            $keyword->addSkill($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKeyword(Keyword $keyword): static
+    {
+        if ($this->keywords->removeElement($keyword)) {
+            $keyword->removeSkill($this);
+        }
+
+        return $this;
     }
 }
