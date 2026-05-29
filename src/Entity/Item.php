@@ -79,10 +79,17 @@ class Item
     #[ORM\Column(nullable: true)]
     private ?int $humanityLoss = null;
 
+    /**
+     * @var Collection<int, Keyword>
+     */
+    #[ORM\ManyToMany(targetEntity: Keyword::class, mappedBy: 'items')]
+    private Collection $keywords;
+
     public function __construct()
     {
         $this->characterItems = new ArrayCollection();
         $this->actions = new ArrayCollection();
+        $this->keywords = new ArrayCollection();
     }
 
     public function getStock(): ?int
@@ -307,6 +314,33 @@ class Item
     public function setIsCumbersome(bool $isCumbersome): static
     {
         $this->isCumbersome = $isCumbersome;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Keyword>
+     */
+    public function getKeywords(): Collection
+    {
+        return $this->keywords;
+    }
+
+    public function addKeyword(Keyword $keyword): static
+    {
+        if (!$this->keywords->contains($keyword)) {
+            $this->keywords->add($keyword);
+            $keyword->addItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKeyword(Keyword $keyword): static
+    {
+        if ($this->keywords->removeElement($keyword)) {
+            $keyword->removeItem($this);
+        }
 
         return $this;
     }

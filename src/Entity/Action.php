@@ -58,9 +58,16 @@ class Action
     #[ORM\Column(nullable: true)]
     private ?int $cout = null;
 
+    /**
+     * @var Collection<int, Keyword>
+     */
+    #[ORM\ManyToMany(targetEntity: Keyword::class, mappedBy: 'actions')]
+    private Collection $keywords;
+
     public function __construct()
     {
         $this->characterActions = new ArrayCollection();
+        $this->keywords = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -165,6 +172,33 @@ class Action
     public function setCout(?int $cout): static
     {
         $this->cout = $cout;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Keyword>
+     */
+    public function getKeywords(): Collection
+    {
+        return $this->keywords;
+    }
+
+    public function addKeyword(Keyword $keyword): static
+    {
+        if (!$this->keywords->contains($keyword)) {
+            $this->keywords->add($keyword);
+            $keyword->addAction($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKeyword(Keyword $keyword): static
+    {
+        if ($this->keywords->removeElement($keyword)) {
+            $keyword->removeAction($this);
+        }
 
         return $this;
     }

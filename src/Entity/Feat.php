@@ -27,12 +27,16 @@ class Feat
     #[ORM\ManyToMany(targetEntity: Action::class)]
     private Collection $actions;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $xpcost = null;
+    /**
+     * @var Collection<int, Keyword>
+     */
+    #[ORM\ManyToMany(targetEntity: Keyword::class, mappedBy: 'feats')]
+    private Collection $keywords;
 
     public function __construct()
     {
         $this->actions = new ArrayCollection();
+        $this->keywords = new ArrayCollection();
     }
 
     public function getXpcost(): ?int
@@ -99,6 +103,36 @@ class Feat
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Keyword>
+     */
+    public function getKeywords(): Collection
+    {
+        return $this->keywords;
+    }
+
+    public function addKeyword(Keyword $keyword): static
+    {
+        if (!$this->keywords->contains($keyword)) {
+            $this->keywords->add($keyword);
+            $keyword->addFeat($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKeyword(Keyword $keyword): static
+    {
+        if ($this->keywords->removeElement($keyword)) {
+            $keyword->removeFeat($this);
+        }
+
+        return $this;
+    }
+
+    #[ORM\Column(nullable: true)]
+    private ?int $xpcost = null;
 
     public function __toString(): string
     {
