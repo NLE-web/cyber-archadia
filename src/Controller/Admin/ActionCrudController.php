@@ -27,7 +27,7 @@ class ActionCrudController extends AbstractCrudController
             ChoiceField::new('usage', 'Usage')->setChoices(ActionEntity::USAGES),
             IntegerField::new('maxUse', 'Max Utilisations'),
             AssociationField::new('item', 'Item lié'),
-            AssociationField::new('keywords', 'Mots-clés'),
+            AssociationField::new('keywords', 'Mots-clés')->setFormTypeOption('by_reference', false),
         ];
     }
 }

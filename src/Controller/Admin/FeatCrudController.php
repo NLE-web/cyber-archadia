@@ -22,8 +22,8 @@ class FeatCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm(),
             TextField::new('name', 'Nom'),
             TextEditorField::new('description', 'Description'),
-            AssociationField::new('actions', 'Actions liées'),
-            AssociationField::new('keywords', 'Mots-clés'),
+            AssociationField::new('actions', 'Actions liées')->setFormTypeOption('by_reference', false),
+            AssociationField::new('keywords', 'Mots-clés')->setFormTypeOption('by_reference', false),
         ];
     }
 }

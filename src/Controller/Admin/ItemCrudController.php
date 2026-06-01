@@ -33,8 +33,8 @@ class ItemCrudController extends AbstractCrudController
             IntegerField::new('stock', 'Stock'),
             BooleanField::new('isInfiniteStock', 'Stock infini'),
             IntegerField::new('humanityLoss', 'Perte d\'Humanité'),
-            AssociationField::new('actions', 'Actions liées'),
-            AssociationField::new('keywords', 'Mots-clés'),
+            AssociationField::new('actions', 'Actions liées')->setFormTypeOption('by_reference', false),
+            AssociationField::new('keywords', 'Mots-clés')->setFormTypeOption('by_reference', false),
         ];
     }
 }
