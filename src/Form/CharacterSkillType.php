@@ -23,7 +23,10 @@ class CharacterSkillType extends AbstractType
                 'label' => 'Niveau',
                 'attr' => ['min' => 0]
             ])
-            ->add('xp', IntegerType::class, [
+            // L'entité CharacterSkill ne possède pas de propriété "xp"
+            // mais une propriété cumulée "xptot". On mappe donc ce champ dessus
+            // tout en conservant le libellé "XP" côté interface.
+            ->add('xptot', IntegerType::class, [
                 'label' => 'XP',
                 'attr' => ['min' => 0]
             ])

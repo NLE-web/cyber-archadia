@@ -260,11 +260,12 @@ final class CharacterController extends AbstractController
                     }
 
                     $amount = null;
-                    if ($action->getItem() && $action->getItem()->isConsume()) {
+                    if ($action->getItem() && ($action->getItem()->isConsume() or $action->getItem()->isAmmo())) {
                         $amount = $item->getAmount();
-                        
-                        // Si l'objet est consommé et que le solde est <= 0, on n'affiche pas l'action
-                        if ($amount <= 0) {
+
+                        // Si l'objet est consommé et que le solde est <= 0, on n'affiche pas l'action,
+                        // sauf s'il s'agit de munitions (isAmmo) qui doivent rester visibles à 0
+                        if (($amount ?? 0) <= 0 && !$action->getItem()->isAmmo()) {
                             continue;
                         }
                     }
@@ -272,7 +273,11 @@ final class CharacterController extends AbstractController
                     $actionsArray[$type][$actionId] = [
                         'object' => $action,
                         'amount' => $amount,
-                        'characterItemId' => $item->getId()
+                        'characterItemId' => $item->getId(),
+                        // Origin details for display in UI
+                        'originType' => 'item',
+                        'originName' => $action->getItem() ? $action->getItem()->getName() : null,
+                        'originItemType' => $action->getItem() ? $action->getItem()->getType() : null,
                     ];
                 }
             }
@@ -295,7 +300,11 @@ final class CharacterController extends AbstractController
                         $actionsArray[$type][$actionId] = [
                             'object' => $action,
                             'amount' => null,
-                            'characterItemId' => null
+                            'characterItemId' => null,
+                            // Origin is the feat granting this action
+                            'originType' => 'feat',
+                            'originName' => $feat->getName(),
+                            'originItemType' => null,
                         ];
                     }
                 }
@@ -316,7 +325,11 @@ final class CharacterController extends AbstractController
                 $actionsArray[$type][$actionId] = [
                     'object' => $action,
                     'amount' => null,
-                    'characterItemId' => null
+                    'characterItemId' => null,
+                    // Core action has no specific origin
+                    'originType' => null,
+                    'originName' => null,
+                    'originItemType' => null,
                 ];
             }
         }
@@ -324,6 +337,44 @@ final class CharacterController extends AbstractController
             "character" => $character,
             "actions" => $actionsArray,
         ]);
+    }
+
+    #[Route('/character/item/{id}/recharge', name: 'app_character_item_recharge', methods: ['GET'])]
+    public function rechargeAmmo(ManagerRegistry $manager, HubInterface $hub, Request $request, CharacterItem $characterItem): Response
+    {
+        $character = $characterItem->getCharacter();
+        if ($character->getPlayer() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $item = $characterItem->getItem();
+        if (!$item || !$item->isAmmo()) {
+            return $this->redirect($request->headers->get('referer') ?: $this->generateUrl('app_character_items'));
+        }
+
+        $price = $item->getChargePrice() ?? 0;
+        if ($price <= 0) {
+            return $this->redirect($request->headers->get('referer') ?: $this->generateUrl('app_character_items'));
+        }
+
+        // Vérifie la monnaie du personnage si le système d'économie est actif
+        if (method_exists($character, 'getMoney') && method_exists($character, 'setMoney')) {
+            if ($character->getMoney() < $price) {
+                $this->addFlash('error', "Fonds insuffisants pour la recharge");
+                return $this->redirect($request->headers->get('referer') ?: $this->generateUrl('app_character_items'));
+            }
+            $character->setMoney($character->getMoney() - $price);
+        }
+
+        $characterItem->setAmount(($characterItem->getAmount() ?? 0) + 1);
+
+        // Log
+        $this->createLog($manager, $hub, $character, 'Recharge de ' . ($item->getName() ?? 'munitions'), -$price, false);
+
+        $manager->getManager()->flush();
+
+        // Retour à la page précédente
+        return $this->redirect($request->headers->get('referer') ?: $this->generateUrl('app_character_items'));
     }
 
     #[Route('/character/summary', name: 'app_character_summary')]

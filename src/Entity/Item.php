@@ -71,6 +71,9 @@ class Item
     private ?int $stock = null;
 
     #[ORM\Column(options: ["default" => false])]
+    private ?bool $isAmmo = false;
+
+    #[ORM\Column(options: ["default" => false])]
     private ?bool $isInfiniteStock = false;
 
     #[ORM\Column(nullable: true)]
@@ -109,6 +112,18 @@ class Item
     public function setIsInfiniteStock(bool $isInfiniteStock): static
     {
         $this->isInfiniteStock = $isInfiniteStock;
+
+        return $this;
+    }
+
+    public function isAmmo(): ?bool
+    {
+        return $this->isAmmo;
+    }
+
+    public function setIsAmmo(bool $isAmmo): static
+    {
+        $this->isAmmo = $isAmmo;
 
         return $this;
     }
