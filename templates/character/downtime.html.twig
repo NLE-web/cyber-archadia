@@ -22,8 +22,8 @@
         <h2 class="text-2xl font-bold tracking-tighter text-accent">DOWNTIME</h2>
         <div class="flex flex-col items-end">
             <span class="text-xs font-bold uppercase tracking-widest text-muted-app">Temps accumulé</span>
-            <div id="total-time-display" class="text-xl font-black {{ preselectedTime > 24 ? 'text-red-500 animate-pulse' : 'text-app' }}">
-                <span id="total-hours">{{ preselectedTime }}</span> / 24H
+            <div id="total-time-display" class="text-xl font-black {{ preselectedTime > character.downtimeBudget ? 'text-red-500 animate-pulse' : 'text-app' }}">
+                <span id="total-hours">{{ preselectedTime }}</span> / {{ character.downtimeBudget }}H
             </div>
         </div>
     </div>

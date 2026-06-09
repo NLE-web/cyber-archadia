@@ -147,8 +147,8 @@ final class DownTimeController extends AbstractController
                 }
             }
 
-            if ($totalTime + $edt->getDowntime()->getTimeCost() > 24) {
-                $this->addFlash('error', 'Le coût total ne peut pas dépasser 24 heures.');
+            if ($totalTime + $edt->getDowntime()->getTimeCost() > $character->getDowntimeBudget()) {
+                $this->addFlash('error', 'Le coût total ne peut pas dépasser ' . $character->getDowntimeBudget() . ' heures.');
                 return $this->redirectToRoute('app_character_downtime');
             }
 

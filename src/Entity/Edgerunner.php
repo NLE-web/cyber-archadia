@@ -90,6 +90,9 @@ class Edgerunner
     #[ORM\Column(options: ["default" => 0])]
     private ?int $humanityLoss = 0;
 
+    #[ORM\Column(options: ["default" => 24])]
+    private ?int $downtimeBudget = 24;
+
     /**
      * @var Collection<int, Stuff>
      */
@@ -126,6 +129,18 @@ class Edgerunner
     public function setHumanityLoss(int $humanityLoss): static
     {
         $this->humanityLoss = $humanityLoss;
+
+        return $this;
+    }
+
+    public function getDowntimeBudget(): ?int
+    {
+        return $this->downtimeBudget;
+    }
+
+    public function setDowntimeBudget(int $downtimeBudget): static
+    {
+        $this->downtimeBudget = $downtimeBudget;
 
         return $this;
     }

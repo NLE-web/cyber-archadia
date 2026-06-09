@@ -38,6 +38,7 @@ class EdgerunnerCrudController extends AbstractCrudController
             IntegerField::new('money', 'Argent'),
             IntegerField::new('xp', 'XP'),
             IntegerField::new('humanityLoss', 'Perte d\'humanité'),
+            IntegerField::new('downtimeBudget', 'Budget Downtime'),
             AssociationField::new('avatar'),
             AssociationField::new('player', 'Joueur'),
             
